@@ -23,5 +23,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
-docker/postgres/data/
+docker/postgres/
+.gitignore
 
