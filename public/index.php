@@ -20,6 +20,6 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 $app->handleRequest(Request::capture());
 
 
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);   // где kernel?
 $response = $kernel->handle($request);
 $response->send();
