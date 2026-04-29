@@ -20,8 +20,11 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('/profile', function () {
-        return 'Welcome to your profile!';
-    });
+
+    Route::get('/profile', [AuthController::class, 'showProfile'])->name('profile.form');
+    Route::patch('/profile/{id}', [AuthController::class, 'updateProfile'])->name('profile.update');
+
+    Route::get('/change-password', [AuthController::class, 'showChangePasswordForm'])->name('password.form');
+    Route::post('/change-password', [AuthController::class, 'updatePassword'])->name('password.update');
 });
 
