@@ -3,15 +3,17 @@
 namespace App\Http\Controllers\Auth;
 
 use App\DTOs\Auth\RegisterDto;
+use App\DTOs\Auth\UpdateProfileDto;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Services\Auth\UserService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use App\DTOs\UpdateProfileDto;// их нету еще
-use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Requests\UpdateProfileRequest;
+
+// их нету еще
 
 
 class AuthController
@@ -58,6 +60,49 @@ class AuthController
         Auth::logout();
 
         return redirect()->route('login.form');
+    }
+
+    public function showProfile(): Factory|View
+    {
+        $user = Auth::user();
+
+        return view('auth.profile', compact('user'));
+    }
+
+    public function updateProfile(UpdateProfileRequest $request): RedirectResponse
+    {
+        $dto = UpdateProfileDto::fromRequest($request);
+        $user = $this
+            ->userService
+            ->updateProfile($dto);
+
+        return redirect()->route('profile.form');
+    }
+
+    public function showChangePasswordForm(): Factory|View
+    {
+        return view('auth.change-password');
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
+    {
+        $validatedData = $request->validated();
+        $user = Auth::user();
+
+        $this
+            ->userService
+            ->updatePassword(
+                $user,
+                $validatedData['current_password'],
+                $validatedData['new_password']
+            );
+
+        return redirect()
+            ->route('profile.form')
+            ->with('status', 'Password successfully changed!');
     }
 }
 
