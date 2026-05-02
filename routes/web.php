@@ -1,30 +1,20 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Auth\LoginController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware('guest')->group(function () {
-    // registration
-    Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register.form');
-    Route::post('/register', [AuthController::class, 'register'])->name('register');
-
-    // login
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
-});
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-    Route::get('/profile', [AuthController::class, 'showProfile'])->name('profile.form');
-    Route::patch('/profile/{id}', [AuthController::class, 'updateProfile'])->name('profile.update');
-
-    Route::get('/change-password', [AuthController::class, 'showChangePasswordForm'])->name('password.form');
-    Route::post('/change-password', [AuthController::class, 'updatePassword'])->name('password.update');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+require __DIR__.'/auth.php';
