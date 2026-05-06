@@ -23,4 +23,4 @@ $app->handleRequest(Request::capture());
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);   // где kernel?
 $response = $kernel->handle($request);
 $response->send();
-sssss
+

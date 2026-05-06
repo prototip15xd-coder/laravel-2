@@ -40,3 +40,6 @@ WORKDIR /var/www/html
 COPY --chown=www-data:www-data . .
 
 USER www-data
+
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
