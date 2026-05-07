@@ -42,3 +42,4 @@ return new Config()
     ])
     ->setFinder($finder);                      // Применяем правила к выбранным файлам
 
+rrrr
