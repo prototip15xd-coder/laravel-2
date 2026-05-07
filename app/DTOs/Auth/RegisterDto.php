@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DTOs\Auth;
 
 use App\Http\Requests\Auth\RegisterRequest;
@@ -13,7 +15,8 @@ class RegisterDto extends Data
         public string $email,
         public ?string $phone,
         public string $password,
-    ) {}
+    ) {
+    }
 
     public static function fromRequest(RegisterRequest $request): self
     {
@@ -26,4 +29,3 @@ class RegisterDto extends Data
         );
     }
 }
-

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\Product;  // нет модели!
+use App\Models\Product;
+use Illuminate\Database\Seeder;  // нет модели!
 
 class ProductSeeder extends Seeder
 {
@@ -23,4 +24,3 @@ class ProductSeeder extends Seeder
         ]);
     }
 }
-

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\DTOs\Auth\RegisterDto;
@@ -20,7 +22,8 @@ class AuthController
 {
     public function __construct(
         private readonly UserService $userService
-    ) {}
+    ) {
+    }
 
     public function showRegistrationForm(): Factory|View
     {
@@ -105,5 +108,3 @@ class AuthController
             ->with('status', 'Password successfully changed!');
     }
 }
-
-

@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Models;
+declare(strict_types=1);
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+namespace App\Models;
 
 #[Fillable([
     'user_id',
@@ -34,8 +32,8 @@ class Sessions extends Model
         return $this->belongsTo(User::class);
     }
 
-//    public function sessions()
-//    {
-//        return $this->hasMany(Session::class, 'user_id');
-//    }
+    //    public function sessions()
+    //    {
+    //        return $this->hasMany(Session::class, 'user_id');
+    //    }
 }

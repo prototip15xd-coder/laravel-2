@@ -32,7 +32,7 @@ $finder = Finder::create()
  * Config — сам объект конфигурации правил PHP CS Fixer.
  * Он задаёт стиль и правила, по которым будет форматироваться код.
  */
-return new Config()
+return (new Config())
     ->setRiskyAllowed(true)                    // Разрешаем "опасные" фиксы (они не ломают проект, но меняют логику в редких случаях)
     ->setRules([
         '@PSR12' => true,                      // Базовый набор правил PSR-12 (в Laravel используется PSR-12, но PSR-2 тоже ок)
@@ -42,4 +42,3 @@ return new Config()
     ])
     ->setFinder($finder);                      // Применяем правила к выбранным файлам
 
-rrrr

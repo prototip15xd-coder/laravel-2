@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
@@ -23,4 +25,3 @@ $app->handleRequest(Request::capture());
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);   // где kernel?
 $response = $kernel->handle($request);
 $response->send();
-

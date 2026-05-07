@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * @property integer $user_id
@@ -30,5 +30,8 @@ class Cart extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function items() { return $this->hasMany(CartItem::class); }
+    public function items()
+    {
+        return $this->hasMany(CartItem::class);
+    }
 }

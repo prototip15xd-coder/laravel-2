@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +13,8 @@ use Illuminate\Notifications\Notifiable;
 #[Hidden(['token'])]
 class PasswordResetToken extends Model //или Authenticatable?
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     protected $table = 'password_reset_tokens';
     protected $primaryKey = 'email';

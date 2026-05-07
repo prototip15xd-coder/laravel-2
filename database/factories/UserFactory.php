@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace database\factories;
 
 use App\Models\User;

@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * @property integer $cart_id
@@ -22,7 +22,13 @@ class CartItem extends Model
         'price',
     ];
 
-    public function cart() { return $this->belongsTo(Cart::class); }
+    public function cart()
+    {
+        return $this->belongsTo(Cart::class);
+    }
 
-    public function product() { return $this->belongsTo(Product::class); }
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
