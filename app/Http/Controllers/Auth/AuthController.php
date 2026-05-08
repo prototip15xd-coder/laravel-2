@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
-use App\DTOs\Auth\RegisterDto;
-use App\DTOs\Auth\UpdateProfileDto;
+use App\DTO\Auth\RegisterDto;
+use App\DTO\Auth\UpdateProfileDto;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\UpdateProfileRequest;

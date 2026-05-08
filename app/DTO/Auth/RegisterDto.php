@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DTOs\Auth;
+namespace App\DTO\Auth;
 
 use App\Http\Requests\Auth\RegisterRequest;
 use Spatie\LaravelData\Data;

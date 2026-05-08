@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Auth;
 
-use App\DTOs\Auth\RegisterDto;
-use App\DTOs\Auth\UpdateProfileDto;
+use App\DTO\Auth\RegisterDto;
+use App\DTO\Auth\UpdateProfileDto;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
