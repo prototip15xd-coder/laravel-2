@@ -8,7 +8,7 @@
 <body>
 <nav class="navbar navbar-light bg-light mb-4">
     <div class="container">
-        <a href="{{ route('home') }}" class="navbar-brand">Laravel Shop</a>
+        <a href="/" class="navbar-brand">Laravel Shop</a>
 
         <div class="d-flex align-items-center gap-2">
 

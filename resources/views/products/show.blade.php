@@ -34,6 +34,11 @@
                     <p class="mb-0">{{ $product->description ?? 'Описание пока не добавлено.' }}</p>
                 </div>
 
+                <p>
+                    <strong>Категория:</strong>
+                    {{ $product->category?->name ?? 'Без категории' }}
+                </p>
+
                 <div class="d-flex gap-2">
                     <button type="button" class="btn btn-primary" disabled>Добавить в корзину</button>
                     <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Назад в каталог</a>

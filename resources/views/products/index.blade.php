@@ -115,6 +115,10 @@
                             </div>
                         @endif
 
+                        <div class="text-muted">
+                            Категория: {{ $product->category?->name ?? 'Без категории' }}
+                        </div>
+
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">{{ $product->name }}</h5>
                             <p class="fw-semibold mb-3">{{ number_format($product->price, 0, ',', ' ') }} ₽</p>

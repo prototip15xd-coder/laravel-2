@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\DTO\ProductFilterDto;
+use App\Http\Requests\ProductFilterRequest;
+
+class CategoryController extends Controller
+{
+    public function index()
+    {
+        $categories = Category::query()
+            ->withCount('products')
+            ->orderBy('name')
+            ->get();
+
+        return view('categories.index', compact('categories'));
+    }
+
+    public function show(Category $category, ProductFilterRequest $request)
+    {
+        $dto = ProductFilterDto::fromRequest($request);
+
+        $products = $this
+            ->productService
+            ->getProductsByCategoryId($category->id, $dto);
+
+        return view('products.index', [
+            'products' => $products,
+            'category' => $category,
+            'dto'      => $dto,
+        ]);
+    }
+}
