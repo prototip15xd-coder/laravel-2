@@ -15,7 +15,7 @@ return new class () extends Migration {
         Schema::table('products', function (Blueprint $table) {
             $table->foreignId('category_id')
                 ->nullable()
-                ->constrained('categories')
+                ->constrained('category')
                 ->nullOnDelete();
         });
 
@@ -27,7 +27,6 @@ return new class () extends Migration {
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            //
         });
     }
 };

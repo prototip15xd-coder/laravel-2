@@ -13,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $description
  * @property float $price
  * @property string $image
+ * @property integer $category_id
  */
 class Product extends Model
 {
@@ -25,6 +26,7 @@ class Product extends Model
         'description',
         'price',
         'image',
+        'category_id',
     ];
 
     protected function casts(): array
@@ -32,5 +34,10 @@ class Product extends Model
         return [
             'timestamps' => 'datetime',
         ];
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

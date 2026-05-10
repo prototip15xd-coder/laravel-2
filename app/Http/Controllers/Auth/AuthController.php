@@ -8,15 +8,14 @@ use App\DTO\Auth\RegisterDto;
 use App\DTO\Auth\UpdateProfileDto;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Services\Auth\UserService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-
-// их нету еще
-
+use Illuminate\Validation\ValidationException;
 
 class AuthController
 {

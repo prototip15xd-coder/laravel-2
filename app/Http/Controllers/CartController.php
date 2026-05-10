@@ -25,7 +25,7 @@ class CartController extends Controller
         ]);
     }
 
-    public function store(Product $product, Request $request)
+    public function store(Product $product, Request $request, SessionCartService $cart)
     {
         $data = $request->validate([
             'quantity' => ['nullable', 'integer', 'min:1'],
@@ -33,10 +33,10 @@ class CartController extends Controller
 
         $this->sessionCartService->add($product, (int) ($data['quantity'] ?? 1));
 
-        return $this->respond($request, $cart);  //нет объекта cart как я могу его запращивать тогда?
+        return $this->respond($request, $cart);
     }
 
-    public function update(Product $product, Request $request)
+    public function update(Product $product, Request $request, SessionCartService $cart)
     {
         $data = $request->validate([
             'quantity' => ['required', 'integer', 'min:0'],
@@ -47,19 +47,19 @@ class CartController extends Controller
         return $this->respond($request, $cart);
     }
 
-    public function destroy(Product $product, Request $request)
+    public function destroy(Product $product, Request $request, SessionCartService $cart)
     {
         $this->sessionCartService->remove($product);
         return $this->respond($request, $cart);
     }
 
-    public function clear(Request $request)
+    public function clear(Request $request, SessionCartService $cart)
     {
         $this->sessionCartService->clear();
         return $this->respond($request, $cart);
     }
 
-    private function respond(Request $request)
+    private function respond(Request $request, SessionCartService $cart)
     {
         $payload = [
             'cartCount' => $cart->getTotalQuantity(),

@@ -7,7 +7,10 @@ namespace App\Services\Auth;
 use App\DTO\Auth\RegisterDto;
 use App\DTO\Auth\UpdateProfileDto;
 use App\Models\User;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class UserService
 {

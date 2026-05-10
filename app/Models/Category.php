@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $slug
  */
-class CartItem extends Model
+class Category extends Model
 {
     protected $table = 'categories';
     protected $fillable = [
@@ -22,7 +22,7 @@ class CartItem extends Model
 
     public function products()
     {
-        return $this->belongsTo(Product::class); /// категория должна принадлежать товару
+        return $this->hasMany(Product::class); /// категория должна принадлежать товару
     }
 
 

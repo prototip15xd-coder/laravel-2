@@ -6,9 +6,15 @@ namespace App\Http\Controllers;
 
 use App\DTO\ProductFilterDto;
 use App\Http\Requests\ProductFilterRequest;
+use App\Models\Category;
+use App\Services\ProductService;
 
 class CategoryController extends Controller
 {
+    public function __construct(
+        private readonly ProductService $productService,
+    ) {
+    }
     public function index()
     {
         $categories = Category::query()
