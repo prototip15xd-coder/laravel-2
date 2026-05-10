@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -40,5 +41,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])
         ->name('categories.show');
+
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/items/{product}', [CartController::class, 'store'])->name('cart.items.store');
+    Route::patch('/cart/items/{product}', [CartController::class, 'update'])->name('cart.items.update');
+    Route::delete('/cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+    Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
 });

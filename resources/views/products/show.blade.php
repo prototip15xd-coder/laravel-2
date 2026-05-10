@@ -40,9 +40,19 @@
                 </p>
 
                 <div class="d-flex gap-2">
+                    <form method="POST"
+                          action="{{ route('cart.items.store', $product) }}"
+                          data-ajax-cart="1"
+                          class="d-inline">
+                        @csrf
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn btn-primary">Добавить в корзину</button>
+                    </form>
+
                     <button type="button" class="btn btn-primary" disabled>Добавить в корзину</button>
                     <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Назад в каталог</a>
                 </div>
+
             </div>
         </div>
     </div>
