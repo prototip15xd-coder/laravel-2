@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class CartController extends Controller
 {
     public function __construct(
-        private SessionCartService $sessionCartService,
+        private readonly SessionCartService $sessionCartService,
     ) {
     }
 
@@ -25,7 +25,7 @@ class CartController extends Controller
         ]);
     }
 
-    public function store(Product $product, Request $request, SessionCartService $cart)
+    public function store(Product $product, Request $request)
     {
         $data = $request->validate([
             'quantity' => ['nullable', 'integer', 'min:1'],
@@ -33,10 +33,10 @@ class CartController extends Controller
 
         $this->sessionCartService->add($product, (int) ($data['quantity'] ?? 1));
 
-        return $this->respond($request, $cart);
+        return $this->respond($request);
     }
 
-    public function update(Product $product, Request $request, SessionCartService $cart)
+    public function update(Product $product, Request $request)
     {
         $data = $request->validate([
             'quantity' => ['required', 'integer', 'min:0'],
@@ -44,23 +44,24 @@ class CartController extends Controller
 
         $this->sessionCartService->setQuantity($product, (int) $data['quantity']);
 
-        return $this->respond($request, $cart);
+        return $this->respond($request);
     }
 
-    public function destroy(Product $product, Request $request, SessionCartService $cart)
+    public function destroy(Product $product, Request $request)
     {
         $this->sessionCartService->remove($product);
-        return $this->respond($request, $cart);
+        return $this->respond($request);
     }
 
-    public function clear(Request $request, SessionCartService $cart)
+    public function clear(Request $request)
     {
         $this->sessionCartService->clear();
-        return $this->respond($request, $cart);
+        return $this->respond($request);
     }
 
-    private function respond(Request $request, SessionCartService $cart)
+    private function respond(Request $request)
     {
+        $cart = $this->sessionCartService;
         $payload = [
             'cartCount' => $cart->getTotalQuantity(),
         ];
@@ -68,8 +69,8 @@ class CartController extends Controller
         if ($request->expectsJson()) {
             $payload['html'] = view('cart._content', [
                 'items' => $cart->getItems(),
-                'totalQuantity' => $this->sessionCartService->getTotalQuantity(),
-                'totalPrice' => $this->sessionCartService->getTotalPrice(),
+                'totalQuantity' => $cart->getTotalQuantity(),
+                'totalPrice' => $cart->getTotalPrice(),
             ])->render();
 
             return response()->json($payload);

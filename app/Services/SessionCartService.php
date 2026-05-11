@@ -127,7 +127,14 @@ class SessionCartService
 
     public function remove(Product $product): void
     {
-        $this->removeById($product->id);  // такого нету еще
+        $this->removeById($product->id);
+    }
+
+    private function removeById(int $productId): void
+    {
+        $raw = $this->getRaw();
+        unset($raw[$productId]);
+        $this->putRaw($raw);
     }
 
     public function clear(): void

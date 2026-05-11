@@ -40,6 +40,18 @@
     @yield('content')  {{-- сюда вставляется контент каждой страницы --}}
 </main>
 <script>
+    function csrfToken() {
+        return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    }
+
+    // Функция для обновления счетчика корзины
+    function setCartCount(count) {
+        const cartCountElement = document.querySelector('[data-cart-count]');
+        if (cartCountElement) {
+            cartCountElement.textContent = count;
+        }
+    }
+
     async function submitCartForm(form) {
         const formData = new FormData(form);
         const response = await fetch(form.action, {
