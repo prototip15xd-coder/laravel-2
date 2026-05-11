@@ -48,4 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
+        ->name('orders.status.update');
 });
