@@ -25,4 +25,5 @@ Homestead.yaml
 Thumbs.db
 docker/postgres/
 .gitignore
+.php-cs-fixer.cache
 
