@@ -26,4 +26,5 @@ Thumbs.db
 docker/postgres/
 .gitignore
 .php-cs-fixer.cache
+/php-cs-fixer.cache
 
