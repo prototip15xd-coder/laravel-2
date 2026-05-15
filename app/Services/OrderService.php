@@ -13,6 +13,9 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
+    /**
+     * @throws \Throwable
+     */
     public function createOrder(User $user, string $paymentMethod, SessionCartService $cart): Order
     {
         $items = $cart->getItems();

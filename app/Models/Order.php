@@ -47,7 +47,7 @@ class Order extends Model
         'shipping_address'
     ];
 
-    public function items(): HasMany
+    public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
@@ -66,5 +66,7 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+
 
 }

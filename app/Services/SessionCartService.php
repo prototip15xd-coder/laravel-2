@@ -10,7 +10,7 @@ class SessionCartService
 {
     private const string SESSION_KEY = 'cart.items';
 
-    private function getRaw(): array
+    public function getRaw(): array
     {
         $raw = session()->get(self::SESSION_KEY, []);
 

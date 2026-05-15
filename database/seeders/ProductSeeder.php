@@ -16,12 +16,14 @@ class ProductSeeder extends Seeder
             'name' => 'iPhone 16 Pro',
             'description' => 'Флагманский смартфон Apple',
             'price' => 120000,
+            'stock' => 10,
         ]);
 
         Product::factory()->create([
             'name' => 'MacBook Pro',
             'description' => 'Мощный ноутбук для разработчиков',
             'price' => 250000,
+            'stock' => 15,
         ]);
 
         // Создать 50 случайных продуктов

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,4 +53,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
         ->name('orders.status.update');
+
+    // Адреса
+    Route::get('/addresses/create', [AuthController::class, 'create'])->name('addresses.create');
+    Route::post('/addresses', [AuthController::class, 'store'])->name('addresses.store');
+    Route::delete('/addresses/{address}', [AuthController::class, 'destroy'])->name('addresses.destroy');
+    Route::patch('/addresses/{address}/set-default', [AuthController::class, 'setDefault'])->name('addresses.set-default');
 });

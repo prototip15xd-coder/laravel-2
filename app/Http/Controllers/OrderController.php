@@ -7,11 +7,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderStatusRequest;
 use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
+use App\Services\OrderService;
 use App\Services\SessionCartService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Throwable;
 
 class OrderController extends Controller
 {
@@ -35,15 +38,31 @@ class OrderController extends Controller
     ): RedirectResponse {
         $user = Auth::user();
 
-        $service->createOrder(
-            $user,
-            $request->validated()['payment_method'],
-            $cart
-        );
+        try {
+            $service->createOrder(
+                $user,
+                $request->validated()['payment_method'],
+                $cart
+            );
+            return redirect()
+                ->route('orders.index')
+                ->with('success', 'Заказ создан.');
+        } catch (ValidationException $e) {
+            // Ошибки валидации (пустая корзина, нет адреса)
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($e->errors());
 
-        return redirect()
-            ->route('orders.index')
-            ->with('success', 'Заказ создан.');
+        } catch (Throwable $e) {
+            // Все остальные ошибки
+            report($e); // записать в лог
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['error' => 'Произошла ошибка при оформлении заказа. Попробуйте позже.']);
+        }
     }
 
     public function updateStatus(

@@ -114,3 +114,53 @@
         });
     </script>
 @endpush
+
+<hr class="my-4">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="h5 mb-0">Адреса доставки</h3>
+    <a href="{{ route('addresses.create') }}" class="btn btn-sm btn-outline-primary">
+        + Добавить адрес
+    </a>
+</div>
+
+@if($addresses->isEmpty())
+    <div class="alert alert-light text-center py-3">
+        <p class="mb-0 text-muted">Нет сохранённых адресов</p>
+    </div>
+@else
+    @foreach($addresses as $address)
+        <div class="border rounded p-3 mb-2">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    @if($address->is_default)
+                        <span class="badge bg-primary mb-1">Основной</span>
+                    @endif
+                    @if($address->title)
+                        <strong class="d-block">{{ $address->title }}</strong>
+                    @endif
+                    <div class="small">{{ $address->recipient_name }}</div>
+                    <div class="small">{{ $address->phone }}</div>
+                    <div class="small">{{ $address->address }}</div>
+                    @if($address->comment)
+                        <div class="small text-muted">{{ $address->comment }}</div>
+                    @endif
+                </div>
+                <div class="btn-group btn-group-sm">
+                    @if(!$address->is_default)
+                        <form method="POST" action="{{ route('addresses.set-default', $address) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-outline-primary">Основной</button>
+                        </form>
+                    @endif
+                    <form method="POST" action="{{ route('addresses.destroy', $address) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Удалить адрес?')">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+@endif

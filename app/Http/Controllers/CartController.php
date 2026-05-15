@@ -18,7 +18,7 @@ class CartController extends Controller
     ) {
     }
 
-    public function index(SessionCartService $cart): Factory|View
+    public function index(): Factory|View
     {
         $defaultAddress = null;
         if (Auth::check()) {
@@ -29,13 +29,16 @@ class CartController extends Controller
         }
 
         return view('cart.index', [
-            'items' => $cart->getItems(),
-            'totalQuantity' => $cart->getTotalQuantity(),
-            'totalPrice' => $cart->getTotalPrice(),
+            'items' => $this->sessionCartService->getItems(),
+            'totalQuantity' => $this->sessionCartService->getTotalQuantity(),
+            'totalPrice' => $this->sessionCartService->getTotalPrice(),
             'defaultAddress' => $defaultAddress,
         ]);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function store(Product $product, Request $request)
     {
         $data = $request->validate([
@@ -70,13 +73,15 @@ class CartController extends Controller
         return $this->respond($request);
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function respond(Request $request)
     {
         $cart = $this->sessionCartService;
         $payload = [
             'cartCount' => $cart->getTotalQuantity(),
         ];
-
         if ($request->expectsJson()) {
             $payload['html'] = view('cart._content', [
                 'items' => $cart->getItems(),
@@ -86,10 +91,10 @@ class CartController extends Controller
 
             return response()->json($payload);
         }
-
         return redirect()
             ->back()
             ->with('cartCount', $payload['cartCount']);
+
     }
 
 

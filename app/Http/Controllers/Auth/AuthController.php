@@ -10,6 +10,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Models\Address;
 use App\Services\Auth\UserService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -105,5 +106,63 @@ class AuthController
         return redirect()
             ->route('profile.form')
             ->with('status', 'Password successfully changed!');
+    }
+
+//    public function addAddress(){
+//        $user = Auth::user();
+//        return view('auth.address', compact('user'));
+//    }
+{
+    public function create()
+    {
+        return view('addresses.create');
+    }
+
+    public function store(AddressRequest $request)
+    {
+        $data = $request->validate([
+            'title' => 'nullable|string|max:100',
+            'recipient_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+            'city' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:100',
+            'comment' => 'nullable|string',
+            'is_default' => 'boolean',
+        ]);
+
+        $data['user_id'] = Auth::id();
+
+        if (!empty($data['is_default'])) {
+            Auth::user()->addresses()->update(['is_default' => false]);
+        }
+
+        Address::create($data);
+
+        return redirect()->route('profile.edit')->with('success', 'Адрес добавлен');
+    }
+
+    public function destroy(Address $address)
+    {
+        if ($address->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $address->delete();
+
+        return redirect()->route('profile.edit')->with('success', 'Адрес удалён');
+    }
+
+    public function setDefault(Address $address)
+    {
+        if ($address->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        Auth::user()->addresses()->update(['is_default' => false]);
+        $address->update(['is_default' => true]);
+
+        return redirect()->route('profile.edit')->with('success', 'Основной адрес изменён');
     }
 }

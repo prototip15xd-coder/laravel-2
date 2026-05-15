@@ -129,7 +129,7 @@
                             </a>
                             <form method="POST"
                                   action="{{ route('cart.items.store', $product) }}"
-                                  data-ajax-cart="1"
+{{--                                  data-ajax-cart="1"--}}
                                   class="d-inline">
                                 @csrf
                                 <input type="hidden" name="quantity" value="1">
