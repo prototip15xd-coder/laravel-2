@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\DTO\Auth\RegisterDto;
 use App\DTO\Auth\UpdateProfileDto;
+use App\Http\Requests\Auth\AddressRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\UpdatePasswordRequest;
@@ -68,8 +69,8 @@ class AuthController
     public function showProfile(): Factory|View
     {
         $user = Auth::user();
-
-        return view('auth.profile', compact('user'));
+        $addresses = $user->addresses()->orderByDesc('is_default')->get();
+        return view('auth.profile', compact('user', 'addresses'));
     }
 
     public function updateProfile(UpdateProfileRequest $request): RedirectResponse
@@ -95,27 +96,25 @@ class AuthController
         $validatedData = $request->validated();
         $user = Auth::user();
 
-        $this
-            ->userService
+        $this->userService
             ->updatePassword(
                 $user,
                 $validatedData['current_password'],
                 $validatedData['new_password']
             );
-
         return redirect()
             ->route('profile.form')
             ->with('status', 'Password successfully changed!');
     }
 
-//    public function addAddress(){
-//        $user = Auth::user();
-//        return view('auth.address', compact('user'));
-//    }
-{
+    //    public function addAddress(){
+    //        $user = Auth::user();
+    //        return view('auth.address', compact('user'));
+    //    }
+
     public function create()
     {
-        return view('addresses.create');
+        return view('auth.address');
     }
 
     public function store(AddressRequest $request)
@@ -124,7 +123,7 @@ class AuthController
             'title' => 'nullable|string|max:100',
             'recipient_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'address' => 'required|string',
+            'address' => 'required|string|min:2',
             'city' => 'nullable|string|max:255',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
@@ -140,7 +139,7 @@ class AuthController
 
         Address::create($data);
 
-        return redirect()->route('profile.edit')->with('success', 'Адрес добавлен');
+        return redirect()->route('profile.form')->with('success', 'Адрес добавлен');
     }
 
     public function destroy(Address $address)

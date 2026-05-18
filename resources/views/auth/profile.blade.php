@@ -99,6 +99,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="d-grid gap-2 mb-4">
+                    <a href="{{ route('orders.index') }}" class="btn btn-outline-primary py-2">
+                        📦 Мои заказы
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -164,3 +169,4 @@
         </div>
     @endforeach
 @endif
+

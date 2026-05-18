@@ -102,5 +102,16 @@ class OrderService
             $order->save();
         });
     }
+    public function cancel(Order $order): void
+    {
+        if ($order->status !== Order::STATUS_PENDING) {
+            throw ValidationException::withMessages([
+                'status' => 'Нельзя отменить заказ в текущем статусе.',
+            ]);
+        }
+
+        $order->status = Order::STATUS_CANCELED;
+        $order->save();
+    }
 
 }

@@ -68,6 +68,13 @@
                                 <form method="POST" action="{{ route('orders.status.update', $order) }}">
                                     @csrf
                                     @method('PATCH')
+                                    <input type="hidden" name="status" value="paid">
+                                    <button type="submit" class="btn btn-success btn-sm">Оплатить</button>
+                                </form>
+
+                                <form method="POST" action="{{ route('orders.status.update', $order) }}">
+                                    @csrf
+                                    @method('PATCH')
                                     <input type="hidden" name="status" value="canceled">
                                     <button type="submit" class="btn btn-outline-danger btn-sm">Отменить</button>
                                 </form>

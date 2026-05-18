@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Order; // а как тогда?
 use Illuminate\Validation\Rule;
 
 class OrderStatusRequest extends FormRequest

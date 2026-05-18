@@ -141,7 +141,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between gap-2">
-                                <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary px-4">
+                                <a href="{{ route('profile.form') }}" class="btn btn-outline-secondary px-4">
                                     Отмена
                                 </a>
                                 <button type="submit" class="btn btn-primary px-4">
