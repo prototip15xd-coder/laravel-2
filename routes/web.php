@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -59,4 +60,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/addresses', [AuthController::class, 'store'])->name('addresses.store');
     Route::delete('/addresses/{address}', [AuthController::class, 'destroy'])->name('addresses.destroy');
     Route::patch('/addresses/{address}/set-default', [AuthController::class, 'setDefault'])->name('addresses.set-default');
+
+    Route::middleware(['auth', 'role:admin'])
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+
+            Route::get('/', [DashboardController::class, 'index'])
+                ->name('dashboard');
+
+        });
+
+    Route::middleware(['auth', 'role:admin'])
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            Route::resource('products', ProductController::class);
+        });
 });

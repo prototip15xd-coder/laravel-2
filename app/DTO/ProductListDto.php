@@ -20,5 +20,4 @@ class ProductListDto extends Data
             per_page: $request->validated('per_page') ?? 10
         );
     }
-
 }

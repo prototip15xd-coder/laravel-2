@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\DTO\ProductDTO;
 use App\DTO\ProductFilterDto;
 use App\Http\Requests\ProductFilterRequest;
+use App\Http\Requests\ProductStoreRequest;
 use App\Models\Product;
 use App\Services\ProductService;
 
@@ -34,5 +36,14 @@ class ProductController extends Controller
     {
         // Страница товара — отдельный урок, здесь оставляем как есть
         return view('products.show', compact('product'));
+    }
+
+    public function store(ProductStoreRequest $request, ProductService $service)
+    {
+        $dto = ProductDTO::fromRequest($request);
+
+        $service->create($dto);
+
+        return redirect()->route('admin.products.index');
     }
 }
