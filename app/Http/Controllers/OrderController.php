@@ -90,6 +90,11 @@ class OrderController extends Controller
             ->with('success', $message);
     }
 
-
+    public function show(Order $order): View
+    {
+        return view('orders.show', [
+            'order' => $order
+        ]);
+    }
 
 }

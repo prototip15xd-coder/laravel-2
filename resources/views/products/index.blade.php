@@ -12,7 +12,21 @@
 
 @section('content')
     <div class="container py-4">
-        <h1 class="h3 mb-3">Каталог товаров</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0">Каталог товаров</h1>
+
+            @auth
+                @if(Auth::user()->hasAnyRole(['admin', 'manager']))
+                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+                        + Создать товар
+                    </a>
+                @endif
+            @endauth
+        </div>
+
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
         @if($errors->any())
             <div class="alert alert-danger">
@@ -127,15 +141,38 @@
                             <a href="{{ $detailsUrl }}" class="btn btn-outline-primary mt-auto">
                                 Подробнее
                             </a>
+
+                            <!-- Кнопка "В корзину" -->
                             <form method="POST"
                                   action="{{ route('cart.items.store', $product) }}"
-{{--                                  data-ajax-cart="1"--}}
-                                  class="d-inline">
+                                  class="d-inline mt-2">
                                 @csrf
                                 <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="btn btn-primary">В корзину</button>
+                                <button type="submit" class="btn btn-primary w-100">В корзину</button>
                             </form>
 
+                            <!-- Кнопки для админов/менеджеров -->
+                            @auth
+                                @if(Auth::user()->hasAnyRole(['admin', 'manager']))
+                                    <div class="mt-2 d-flex gap-2">
+                                        <a href="{{ route('admin.products.edit', $product) }}"
+                                           class="btn btn-sm btn-outline-primary w-100">
+                                            ✏️ Редактировать
+                                        </a>
+                                        <form method="POST"
+                                              action="{{ route('admin.products.destroy', $product) }}"
+                                              class="w-100">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger w-100"
+                                                    onclick="return confirm('Удалить товар {{ $product->name }}?')">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            @endauth
                         </div>
                     </div>
                 </div>

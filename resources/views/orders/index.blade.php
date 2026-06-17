@@ -48,7 +48,11 @@
                             <span class="text-muted">Адрес:</span>
                             {{ $order->shipping_address ?? '—' }}
                         </div>
-
+                        <div class="mb-3">
+                            <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-outline-primary">
+                                Подробнее
+                            </a>
+                        </div>
                         <ul class="list-group list-group-flush mb-3">
                             @foreach($order->items as $item)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
@@ -52,6 +53,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
         ->name('orders.status.update');
 
@@ -66,9 +68,23 @@ Route::middleware('auth')->group(function () {
         ->name('admin.')
         ->group(function () {
 
-            Route::get('/', [DashboardController::class, 'index'])
-                ->name('dashboard');
+            Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+            Route::get('/users', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('users.index');
+            Route::get('/users/create', [App\Http\Controllers\Admin\AdminController::class, 'create'])->name('users.create');
+            Route::post('/users', [App\Http\Controllers\Admin\AdminController::class, 'store'])->name('users.store');
+            Route::get('/users/{user}', [App\Http\Controllers\Admin\AdminController::class, 'show'])->name('users.show');
+            Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\AdminController::class, 'edit'])->name('users.edit');
+            Route::delete('/users/{user}', [App\Http\Controllers\Admin\AdminController::class, 'destroy'])->name('users.destroy');
+            Route::post('/users/{user}/reset-password', [App\Http\Controllers\Admin\AdminController::class, 'resetPassword'])->name('users.reset-password');
+            Route::patch('/users/{user}', [App\Http\Controllers\Admin\AdminController::class, 'update'])->name('users.update');
 
+            Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+            Route::get('/orders/create', [AdminOrderController::class, 'create'])->name('orders.create');
+            Route::post('/orders', [AdminOrderController::class, 'store'])->name('orders.store');
+            Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+            Route::get('/orders/{order}/edit', [AdminOrderController::class, 'edit'])->name('orders.edit');
+            Route::patch('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
+            Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
         });
 
     Route::middleware(['auth', 'role:admin'])

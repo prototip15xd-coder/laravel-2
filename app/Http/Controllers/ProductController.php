@@ -10,6 +10,7 @@ use App\Http\Requests\ProductFilterRequest;
 use App\Http\Requests\ProductStoreRequest;
 use App\Models\Product;
 use App\Services\ProductService;
+use Illuminate\Support\Facades\View;
 
 class ProductController extends Controller
 {
@@ -45,5 +46,12 @@ class ProductController extends Controller
         $service->create($dto);
 
         return redirect()->route('admin.products.index');
+    }
+
+    public function edit(Product $product): View
+    {
+        return view('admin.products.edit', [
+            'product' => $product
+        ]);
     }
 }

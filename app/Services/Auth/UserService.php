@@ -54,4 +54,5 @@ class UserService
         $user->password = Hash::make($newPassword);
         $user->save();
     }
+
 }

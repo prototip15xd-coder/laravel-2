@@ -113,5 +113,4 @@ class OrderService
         $order->status = Order::STATUS_CANCELED;
         $order->save();
     }
-
 }
