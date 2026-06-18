@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
@@ -91,6 +92,11 @@ Route::middleware('auth')->group(function () {
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
-            Route::resource('products', ProductController::class);
+            Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+            Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
+            Route::get('/products/{product}', [AdminProductController::class, 'show'])->name('products.show');
+            Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
+            Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
+            Route::patch('/products/{product}', [AdminProductController::class, 'update'])->name('products.update');
         });
 });

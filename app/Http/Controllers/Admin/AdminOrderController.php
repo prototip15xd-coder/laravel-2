@@ -7,14 +7,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\OrderUpdateRequest;
 use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use App\Services\Admin\AdminOrderService;
-use App\Services\SessionCartService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use PHPUnit\Event\Code\Throwable;
 
 class AdminOrderController
 {
@@ -29,11 +28,16 @@ class AdminOrderController
             'orders' => $orders,
         ]);
     }
-    public function store(OrderStoreRequest $request, AdminOrderService $service)
-    {
-        $service->create($request->validated());
 
-        return redirect()->route('admin.orders.index');
+    public function create(): View
+    {
+        $users = User::all();
+        $products = Product::all();
+
+        return view('admin.orders.create', [
+            'users' => $users,
+            'products' => $products,
+        ]);
     }
 
     public function show(Order $order): View
@@ -43,40 +47,38 @@ class AdminOrderController
         ]);
     }
 
-    public function create(
-        OrderStoreRequest $request,
-        AdminOrderService $service,
-        SessionCartService $cart
-    ): RedirectResponse {
+    public function store(OrderStoreRequest $request, AdminOrderService $service): RedirectResponse
+    {
         try {
             $data = [
-                'user_id' => Auth::id(),
-                'status' => 'pending',
+                'user_id' => $request->validated()['user_id'],
                 'payment_method' => $request->validated()['payment_method'],
-                'items' => $cart->getItems(),
-                'total' => $cart->getTotalPrice()
+                'status' => 'pending',
+                'items' => $request->validated()['items'],
+                'total' => $this->calculateTotal($request->validated()['items']),
             ];
 
             $service->create($data);
+
             return redirect()
-                ->route('orders.index')
+                ->route('admin.orders.index')
                 ->with('success', 'Заказ создан.');
+
         } catch (ValidationException $e) {
-            // Ошибки валидации (пустая корзина, нет адреса)
             return redirect()
                 ->back()
                 ->withInput()
                 ->withErrors($e->errors());
-
-        } catch (Throwable $e) {
-            // Все остальные ошибки
-            report($e); // записать в лог
-
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors(['error' => 'Произошла ошибка при оформлении заказа. Попробуйте позже.']);
         }
+    }
+
+    private function calculateTotal(array $items): float
+    {
+        $total = 0;
+        foreach ($items as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+        return $total;
     }
 
     public function edit(Order $order): View

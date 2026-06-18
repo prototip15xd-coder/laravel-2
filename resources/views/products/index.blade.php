@@ -151,28 +151,6 @@
                                 <button type="submit" class="btn btn-primary w-100">В корзину</button>
                             </form>
 
-                            <!-- Кнопки для админов/менеджеров -->
-                            @auth
-                                @if(Auth::user()->hasAnyRole(['admin', 'manager']))
-                                    <div class="mt-2 d-flex gap-2">
-                                        <a href="{{ route('admin.products.edit', $product) }}"
-                                           class="btn btn-sm btn-outline-primary w-100">
-                                            ✏️ Редактировать
-                                        </a>
-                                        <form method="POST"
-                                              action="{{ route('admin.products.destroy', $product) }}"
-                                              class="w-100">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger w-100"
-                                                    onclick="return confirm('Удалить товар {{ $product->name }}?')">
-                                                🗑️
-                                            </button>
-                                        </form>
-                                    </div>
-                                @endif
-                            @endauth
                         </div>
                     </div>
                 </div>
