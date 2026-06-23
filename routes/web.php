@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
@@ -31,6 +32,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile', [AuthController::class, 'showProfile'])->name('profile.form');
     Route::patch('/profile/{id}', [AuthController::class, 'updateProfile'])->name('profile.update');
+    Route::delete('/profile/delete', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/change-password', [AuthController::class, 'showChangePasswordForm'])->name('password.form');
     Route::post('/change-password', [AuthController::class, 'updatePassword'])->name('password.update');
@@ -64,6 +66,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/addresses/{address}', [AuthController::class, 'destroy'])->name('addresses.destroy');
     Route::patch('/addresses/{address}/set-default', [AuthController::class, 'setDefault'])->name('addresses.set-default');
 
+
+    Route::get('/email/verify', [AuthController::class, 'verify'])->name('email.verify');
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'signed'])->name('verification.verify');
+    Route::post('/email/verification-notification', [AuthController::class, 'send'])->name('verification.send');
+
     Route::middleware(['auth', 'role:admin'])
         ->prefix('admin')
         ->name('admin.')
@@ -86,12 +93,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/orders/{order}/edit', [AdminOrderController::class, 'edit'])->name('orders.edit');
             Route::patch('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
             Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
-        });
 
-    Route::middleware(['auth', 'role:admin'])
-        ->prefix('admin')
-        ->name('admin.')
-        ->group(function () {
             Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
             Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
             Route::get('/products/{product}', [AdminProductController::class, 'show'])->name('products.show');

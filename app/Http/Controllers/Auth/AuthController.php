@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\DTO\Auth\RegisterDto;
 use App\DTO\Auth\UpdateProfileDto;
+//use App\Http\Controllers\Request\EmailVerificationRequest;
 use App\Http\Requests\Auth\AddressRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -15,6 +16,7 @@ use App\Models\Address;
 use App\Services\Auth\UserService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -38,9 +40,17 @@ class AuthController
             ->userService
             ->register($dto);
 
+        Auth::login($user);
+
+        $user->sendEmailVerificationNotification();
+
         return redirect()
-            ->route('login.form')
-            ->with('status', 'Регистрация прошла успешно');
+            ->route('email.verify')
+            ->with('status', 'Регистрация прошла успешно, подтвердите профиль: укажите почту на которую отправить пиьсом подтверждения');
+
+        //        return redirect()
+        //            ->route('login.form')
+        //            ->with('status', 'Регистрация прошла успешно');
     }
 
     public function showLoginForm(): Factory|View
@@ -107,11 +117,6 @@ class AuthController
             ->with('status', 'Password successfully changed!');
     }
 
-    //    public function addAddress(){
-    //        $user = Auth::user();
-    //        return view('auth.address', compact('user'));
-    //    }
-
     public function create()
     {
         return view('auth.address');
@@ -164,4 +169,42 @@ class AuthController
 
         return redirect()->route('profile.edit')->with('success', 'Основной адрес изменён');
     }
+
+    public function verify(): View
+    {
+        return view('auth.verify-email');
+    }
+
+    public function signed(EmailVerificationRequest $request): RedirectResponse
+    {
+        $request->fulfill();
+        return redirect()->route('profile.form')->with('success', 'Email подтверждён!');
+    }
+
+    public function send()
+    {
+        Auth::user()->sendEmailVerificationNotification();
+        return back()->with('success', 'Ссылка для подтверждения отправлена!');
+    }
+
+    //    public function send(Request $request)
+    //    {
+    //        try {
+    //            // Самый простой тест: просто отправить письмо через Resend
+    //            $resend = new \Resend\Client('re_XELRhyHK_6grqbA4RpBGXfYjHFUKYJLpN');
+    //
+    //            $response = $resend->emails->send([
+    //                'from' => 'onboarding@resend.dev',
+    //                'to' => [$request->user()->email],
+    //                'subject' => 'Тест',
+    //                'html' => '<p>Тест</p>'
+    //            ]);
+    //
+    //            // Если письмо отправилось, выведем ответ Resend
+    //            dd($response);
+    //        } catch (\Exception $e) {
+    //            // Если ошибка, покажем её
+    //            dd($e->getMessage());
+    //        }
+    //    }
 }
