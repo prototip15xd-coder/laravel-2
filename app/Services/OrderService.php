@@ -13,11 +13,19 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
+    public function __construct(
+        private YooKassaPaymentService $yooKassaService
+    ) {
+    }
+
     /**
      * @throws \Throwable
      */
-    public function createOrder(User $user, string $paymentMethod, SessionCartService $cart): Order
-    {
+    public function createOrder(
+        User $user,
+        string $paymentMethod,
+        SessionCartService $cart,
+    ): Order {
         $items = $cart->getItems();
         if (empty($items)) {
             throw ValidationException::withMessages([
@@ -34,6 +42,7 @@ class OrderService
                 'address' => 'Добавьте адрес в профиле и выберите основной.',
             ]);
         }
+
 
         return DB::transaction(function () use ($user, $address, $paymentMethod, $cart, $items): Order {
             $order = Order::create([
@@ -53,6 +62,12 @@ class OrderService
                     'quantity' => $item['quantity'],
                     'price' => $item['unit_price'],
                 ]);
+            }
+
+            if ($paymentMethod === 'yookassa') {
+                $payment = $this->yooKassaService->createPaymentForOrder($order);
+                // Внутри createPaymentForOrder() тоже должна быть транзакция
+                // Или она должна быть вызвана отдельно
             }
 
             $cart->clear();

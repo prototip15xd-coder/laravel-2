@@ -31,11 +31,11 @@ class Order extends Model
     ];
 
     public const PAYMENT_METHOD_CASH = 'cash';
-    public const PAYMENT_METHOD_CARD = 'card';
+    public const PAYMENT_METHOD_YOOKASSA = 'yookassa';
 
     public const PAYMENT_METHOD_LABELS = [
-        self::PAYMENT_METHOD_CASH => 'Наличными при получении',
-        self::PAYMENT_METHOD_CARD => 'Картой при получении',
+        self::PAYMENT_METHOD_CASH => 'Оплата при получении',
+        self::PAYMENT_METHOD_YOOKASSA => 'Онлайн на сайте',
     ];
 
     protected $fillable = [
@@ -66,4 +66,15 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function payments()
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
+
+    public function latestPayment()
+    {
+        return $this->hasMany(OrderPayment::class)->latestOfMany();
+    }
+
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\YooKassaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -70,6 +71,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/email/verify', [AuthController::class, 'verify'])->name('email.verify');
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'signed'])->name('verification.verify');
     Route::post('/email/verification-notification', [AuthController::class, 'send'])->name('verification.send');
+
+    Route::post('/payments/yookassa/webhook', [YooKassaController::class, 'webhook'])->name('payments.yookassa.webhook');
 
     Route::middleware(['auth', 'role:admin'])
         ->prefix('admin')

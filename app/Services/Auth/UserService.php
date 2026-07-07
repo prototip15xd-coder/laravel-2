@@ -7,6 +7,7 @@ namespace App\Services\Auth;
 use App\DTO\Auth\RegisterDto;
 use App\DTO\Auth\UpdateProfileDto;
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -25,6 +26,8 @@ class UserService
 
         // TODO: после изучения очередей добавить событие для отправки приветственного письма:
         // event(new Registered($user));
+
+        $user->sendEmailVerificationNotification();
 
         return $user;
     }
@@ -53,6 +56,12 @@ class UserService
 
         $user->password = Hash::make($newPassword);
         $user->save();
+    }
+
+    public function SendRegistrationVerificationJob()
+    {
+        $this->notify(new VerifyEmailNotification());
+
     }
 
 }

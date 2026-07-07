@@ -9,6 +9,7 @@ use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\SessionCartService;
+use App\Services\YooKassaPaymentService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +19,13 @@ use Throwable;
 
 class OrderController extends Controller
 {
-    public function index(): Factory|View  // factory?
+    public function index(): RedirectResponse|View  // factory?
     {
+        if (!auth()->user()->hasVerifiedEmail()) {
+            return redirect()->route('profile.form')
+                ->with('error', 'Для просмотра заказов подтвердите email!');
+        }
+
         $orders = Order::query()
             ->where('user_id', Auth::id())
             ->with(['items.product'])
@@ -95,6 +101,20 @@ class OrderController extends Controller
         return view('orders.show', [
             'order' => $order
         ]);
+    }
+
+    public function pay(Order $order, YooKassaPaymentService $paymentService): RedirectResponse
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($order->status === Order::STATUS_PENDING) {
+            return redirect()->route('order.show', $order)->with('error', 'Заказ уже оплачен или отменен');
+        }
+        $payment = $paymentService->createPaymentForOrder($order);
+
+        return redirect()->away($payment->confirmition_url);
     }
 
 }

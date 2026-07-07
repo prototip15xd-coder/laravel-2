@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Auth;
 use App\DTO\Auth\RegisterDto;
 use App\DTO\Auth\UpdateProfileDto;
 //use App\Http\Controllers\Request\EmailVerificationRequest;
+use App\Http\Job\SendRegistrationVerificationJob;
+use App\Http\Job\SendWelcomeAfterVerificationJob;
 use App\Http\Requests\Auth\AddressRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -41,16 +43,12 @@ class AuthController
             ->register($dto);
 
         Auth::login($user);
-
-        $user->sendEmailVerificationNotification();
+        //$request->session()->regenerate();
+        SendRegistrationVerificationJob::dispatch($user->id);
 
         return redirect()
             ->route('email.verify')
             ->with('status', 'Регистрация прошла успешно, подтвердите профиль: укажите почту на которую отправить пиьсом подтверждения');
-
-        //        return redirect()
-        //            ->route('login.form')
-        //            ->with('status', 'Регистрация прошла успешно');
     }
 
     public function showLoginForm(): Factory|View
@@ -177,7 +175,15 @@ class AuthController
 
     public function signed(EmailVerificationRequest $request): RedirectResponse
     {
+        $user = Auth::user();
+        $wasVerified = $user->hasVerifiedEmail();
+        \Log::info('wasVerified', ['value' => $wasVerified]);
         $request->fulfill();
+
+        if (!$wasVerified) {
+            SendWelcomeAfterVerificationJob::dispatch($user->id);
+        }
+
         return redirect()->route('profile.form')->with('success', 'Email подтверждён!');
     }
 
@@ -186,25 +192,4 @@ class AuthController
         Auth::user()->sendEmailVerificationNotification();
         return back()->with('success', 'Ссылка для подтверждения отправлена!');
     }
-
-    //    public function send(Request $request)
-    //    {
-    //        try {
-    //            // Самый простой тест: просто отправить письмо через Resend
-    //            $resend = new \Resend\Client('re_XELRhyHK_6grqbA4RpBGXfYjHFUKYJLpN');
-    //
-    //            $response = $resend->emails->send([
-    //                'from' => 'onboarding@resend.dev',
-    //                'to' => [$request->user()->email],
-    //                'subject' => 'Тест',
-    //                'html' => '<p>Тест</p>'
-    //            ]);
-    //
-    //            // Если письмо отправилось, выведем ответ Resend
-    //            dd($response);
-    //        } catch (\Exception $e) {
-    //            // Если ошибка, покажем её
-    //            dd($e->getMessage());
-    //        }
-    //    }
 }
