@@ -63,8 +63,8 @@ class AdminProductController extends Controller
 
     public function create(): View
     {
-        $categories = Category::query()
-            ->orderByDesc('created_at');
+        $categories = Category::query()->orderByDesc('created_at')->get();
+
         return view('admin.products.create', [
             'categories' => $categories,
         ]);

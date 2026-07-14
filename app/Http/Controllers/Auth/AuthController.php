@@ -38,9 +38,7 @@ class AuthController
     public function register(RegisterRequest $request): RedirectResponse
     {
         $dto = RegisterDto::fromRequest($request);
-        $user = $this
-            ->userService
-            ->register($dto);
+        $user = $this->userService->register($dto);
 
         Auth::login($user);
         //$request->session()->regenerate();

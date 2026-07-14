@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 class YooKassaPaymentService
 {
     public function __construct(
-        protected OrderService $orderService
     ) {
     }
 
@@ -94,30 +93,39 @@ class YooKassaPaymentService
             return;
         }
 
-        // Обновляем статус
-        $payment->status = $paymentData['status'];
-        $payment->response_payload = $paymentData;
+        // Проверяем статус через API YooKassa (НЕ верим вебхуку)
+        $this->fetchPayment($payment);
+        $payment->refresh();
 
-        if ($paymentData['status'] === 'succeeded') {
+        // бновляем локальный статус на основе ответа API
+        if ($payment->status === 'succeeded') {
             $payment->paid_at = now();
             $payment->save();
-
-            // Меняем статус заказа на оплаченный
-            $this->orderService->markAsPaid($payment->order);
 
             // Создаём чек
             $this->createReceipt($payment);
 
-            Log::info('Webhook: платёж успешен', ['payment_id' => $payment->id]);
+            Log::info('Webhook: платёж успешен (подтверждён API)', [
+                'payment_id' => $payment->id,
+                'external_id' => $payment->external_payment_id,
+            ]);
 
-        } elseif ($paymentData['status'] === 'canceled') {
+        } elseif ($payment->status === 'canceled') {
             $payment->canceled_at = now();
             $payment->save();
 
-            Log::info('Webhook: платёж отменён', ['payment_id' => $payment->id]);
+            Log::info('Webhook: платёж отменён (подтверждён API)', [
+                'payment_id' => $payment->id,
+                'external_id' => $payment->external_payment_id,
+            ]);
+
         } else {
             $payment->save();
-            Log::info('Webhook: обновлён статус платежа', ['payment_id' => $payment->id, 'status' => $payment->status]);
+
+            Log::info('Webhook: обновлён статус платежа (подтверждён API)', [
+                'payment_id' => $payment->id,
+                'status' => $payment->status,
+            ]);
         }
     }
 

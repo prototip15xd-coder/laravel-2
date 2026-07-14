@@ -70,7 +70,7 @@
                         <!-- Кнопки действий (только для pending заказов) -->
                         @if($order->status === 'pending')
                             <div class="d-flex gap-2 mt-4">
-                                <form method="POST" action="{{ route('orders.status.update', $order) }}">
+                                <form method="POST" action="{{ route('orders.pay', $order) }}">
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="status" value="paid">

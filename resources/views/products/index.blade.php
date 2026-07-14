@@ -116,51 +116,14 @@
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
             @forelse($products as $product)
-                <div class="col">
-                    <div class="card h-100">
-                        @if($product->image)
-                            <img src="{{ asset('storage/' . $product->image) }}"
-                                 class="card-img-top"
-                                 alt="{{ $product->name }}">
-                        @else
-                            <div class="card-img-top d-flex align-items-center justify-content-center bg-light"
-                                 style="height: 180px;">
-                                <span class="text-muted">Нет изображения</span>
-                            </div>
-                        @endif
-
-                        <div class="text-muted">
-                            Категория: {{ $product->category?->name ?? 'Без категории' }}
-                        </div>
-
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ $product->name }}</h5>
-                            <p class="fw-semibold mb-3">{{ number_format($product->price, 0, ',', ' ') }} ₽</p>
-
-                            @php($detailsUrl = Route::has('products.show') ? route('products.show', $product) : '#')
-                            <a href="{{ $detailsUrl }}" class="btn btn-outline-primary mt-auto">
-                                Подробнее
-                            </a>
-
-                            <!-- Кнопка "В корзину" -->
-                            <form method="POST"
-                                  action="{{ route('cart.items.store', $product) }}"
-                                  class="d-inline mt-2">
-                                @csrf
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="btn btn-primary w-100">В корзину</button>
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
+                @include("products.item", ["product" => $product])
             @empty
                 <p>По заданным условиям товары не найдены.</p>
             @endforelse
         </div>
 
+
         <div class="mt-4">
             {{ $products->links('pagination::bootstrap-5') }}
         </div>
-    </div>
 @endsection

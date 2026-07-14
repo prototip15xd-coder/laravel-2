@@ -105,16 +105,27 @@ class OrderController extends Controller
 
     public function pay(Order $order, YooKassaPaymentService $paymentService): RedirectResponse
     {
+        \Log::info('pay() called', [
+            'order_id' => $order->id,
+            'order_status' => $order->status,
+            'user_id' => Auth::id(),
+        ]);
+
         if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
-        if ($order->status === Order::STATUS_PENDING) {
-            return redirect()->route('order.show', $order)->with('error', 'Заказ уже оплачен или отменен');
+        // Проверяем, что заказ НЕ оплачен и НЕ отменён
+        if ($order->status !== Order::STATUS_PENDING) {
+            return redirect()->route('orders.show', $order)
+                ->with('error', 'Этот заказ уже оплачен или отменён.');
         }
+
+        // Создаём платёж
         $payment = $paymentService->createPaymentForOrder($order);
 
-        return redirect()->away($payment->confirmition_url);
+        // Редиректим на YooKassa
+        return redirect()->away($payment->confirmation_url);
     }
 
 }

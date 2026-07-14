@@ -33,6 +33,10 @@ class Order extends Model
     public const PAYMENT_METHOD_CASH = 'cash';
     public const PAYMENT_METHOD_YOOKASSA = 'yookassa';
 
+    public const PAYMENT_METHODS = [
+        self::PAYMENT_METHOD_CASH,
+        self::PAYMENT_METHOD_YOOKASSA,
+    ];
     public const PAYMENT_METHOD_LABELS = [
         self::PAYMENT_METHOD_CASH => 'Оплата при получении',
         self::PAYMENT_METHOD_YOOKASSA => 'Онлайн на сайте',
@@ -74,7 +78,6 @@ class Order extends Model
 
     public function latestPayment()
     {
-        return $this->hasMany(OrderPayment::class)->latestOfMany();
+        return $this->hasOne(OrderPayment::class)->ofMany('created_at', 'max');
     }
-
 }

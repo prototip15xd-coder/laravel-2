@@ -31,7 +31,7 @@
                                value="cash"
                             @checked(old('payment_method', 'cash') === 'cash')>
                         <label class="form-check-label" for="payment-cash">
-                            Наличными при получении
+                            При получении
                         </label>
                     </div>
 
@@ -40,10 +40,10 @@
                                type="radio"
                                name="payment_method"
                                id="payment-card"
-                               value="card"
-                            @checked(old('payment_method') === 'card')>
+                               value="yooKassa"
+                            @checked(old('payment_method') === 'yooKassa')>
                         <label class="form-check-label" for="payment-card">
-                            Картой при получении
+                            Онлайн через YooKassa: карта, СБП, SberPay, T-Pay, Alfa Pay
                         </label>
                     </div>
                     @if($errors->any())

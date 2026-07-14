@@ -18,8 +18,8 @@ class ProductStoreRequest extends FormRequest
             'name' => ['required', 'string'],
             'price' => ['required', 'numeric'],
             'stock' => ['required', 'integer'],
-            'sku' => ['required', 'string', 'unique:products,sku'],
-            'status' => ['required', 'in:active,inactive'],
+            //'sku' => ['required', 'string', 'unique:products,sku'],
+            //'status' => ['required', 'in:active,inactive'],
             'image' => ['nullable', 'image', 'max:2048'],
             'category_id' => ['nullable', 'exists:categories,id'],
         ];

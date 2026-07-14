@@ -5,20 +5,8 @@
 @section('content')
     <div class="container py-4">
         <div class="row g-4">
-            <div class="col-md-5">
-                @if($product->image)
-                    <div class="border rounded overflow-hidden">
-                        <img src="{{ asset('storage/' . $product->image) }}"
-                             class="w-100"
-                             alt="{{ $product->name }}">
-                    </div>
-                @else
-                    <div class="border rounded d-flex align-items-center justify-content-center bg-light"
-                         style="height: 320px;">
-                        <span class="text-muted">Нет изображения</span>
-                    </div>
-                @endif
-            </div>
+
+            @include("products.item", ["products" => $product])
 
             <div class="col-md-7">
                 <h1 class="h3 mb-3">{{ $product->name }}</h1>
@@ -40,13 +28,6 @@
                 </p>
 
                 <div class="d-flex gap-2">
-                    <form method="POST"
-                          action="{{ route('cart.items.store', $product) }}"
-                          class="d-inline">
-                        @csrf
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit" class="btn btn-primary">Добавить в корзину</button>
-                    </form>
                     <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Назад в каталог</a>
                 </div>
 

@@ -38,10 +38,19 @@ class YooKassaController extends Controller
 
     public function webhook(
         YooKassaRequest $request,
-        YooKassaPaymentService $yooKassaPaymentService
+        YooKassaPaymentService $yooKassaService,
+        OrderService $orderService
     ): JsonResponse {
         $weebhookData = $request->all();
-        $yooKassaPaymentService->handleWebhook($weebhookData);
+        $yooKassaService->handleWebhook($weebhookData);
+
+        $paymentId = $request->input('object.id');
+        $payment = OrderPayment::where('external_payment_id', $paymentId)->first();
+
+        // Если API подтвердил успех — вызываем markAsPaid()
+        if ($payment && $payment->status === 'succeeded') {
+            $orderService->markAsPaid($payment->order);
+        }
 
         return response()->json(['status' => 'success']);
     }
