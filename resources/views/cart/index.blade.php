@@ -40,8 +40,8 @@
                                type="radio"
                                name="payment_method"
                                id="payment-card"
-                               value="yooKassa"
-                            @checked(old('payment_method') === 'yooKassa')>
+                               value="yookassa"
+                            @checked(old('payment_method') === 'yookassa')>
                         <label class="form-check-label" for="payment-card">
                             Онлайн через YooKassa: карта, СБП, SberPay, T-Pay, Alfa Pay
                         </label>

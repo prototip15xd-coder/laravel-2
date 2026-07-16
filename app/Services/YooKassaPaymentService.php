@@ -9,6 +9,7 @@ use App\Models\OrderPayment;
 use App\Models\PaymentReceipt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class YooKassaPaymentService
 {
@@ -32,7 +33,7 @@ class YooKassaPaymentService
 
         $payload = [
             'amount' => [
-                'value' => number_format($order->total, 2, '.', ''),
+                'value' => number_format((float)$order->total, 2, '.', ''),
                 'currency' => 'RUB',
             ],
             'capture' => true,
@@ -48,8 +49,16 @@ class YooKassaPaymentService
         ];
 
         // Отправляем запрос в YooKassa
-        $response = Http::withBasicAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'))
-            ->post('https://api.yookassa.ru/v3/payments', $payload);
+        //        $response = Http::withBasicAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'))
+        //            ->post('https://api.yookassa.ru/v3/payments', $payload);
+
+        $response = Http::withBasicAuth(
+            config('services.yookassa.shop_id'),
+            config('services.yookassa.secret_key')
+        )->withHeaders([
+            'Idempotence-Key' => Str::uuid()->toString(),
+        ])->post('https://api.yookassa.ru/v3/payments', $payload);
+
 
         // Сохраняем запрос и ответ
         $payment->request_payload = $payload;
@@ -64,11 +73,21 @@ class YooKassaPaymentService
 
         $data = $response->json();
 
+        \Log::info('3 до обнов локального статуса createpaymentForOrder YooKassaPaymentService', [
+            'payment_status' => $payment->status,
+            'order_status' => $order->status,
+        ]);
+
         // Обновляем локальную запись
         $payment->external_payment_id = $data['id'];
         $payment->status = $data['status'];
         $payment->confirmation_url = $data['confirmation']['confirmation_url'];
         $payment->save();
+
+        \Log::info('4 после обнов локального статуса createpaymentForOrder YooKassaPaymentService', [
+            'payment_status' => $payment->status,
+            'order_status' => $order->status,
+        ]);
 
         return $payment;
     }
@@ -96,6 +115,10 @@ class YooKassaPaymentService
         // Проверяем статус через API YooKassa (НЕ верим вебхуку)
         $this->fetchPayment($payment);
         $payment->refresh();
+
+        Log::info('Webhook: статус платежа', [
+            'payment_status' => $payment->status,
+        ]);
 
         // бновляем локальный статус на основе ответа API
         if ($payment->status === 'succeeded') {
@@ -134,17 +157,31 @@ class YooKassaPaymentService
         if (!$payment->external_payment_id) {
             throw new \Exception('У платежа нет external_payment_id');
         }
+        \Log::info('FetchPayment YooKasPaymServ 1', [
+            'shop_id' => config('services.yookassa.shop_id'),
+            'secret_key' => config('services.yookassa.secret_key') ? 'set' : 'not set',
+        ]);
 
         $response = Http::withBasicAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'))
             ->get("https://api.yookassa.ru/v3/payments/{$payment->external_payment_id}");
+        //
+        //        $response = Http::withBasicAuth($shopId, $secretKey)
+        //            ->withHeaders([
+        //                'Idempotence-Key' => $idempotenceKey,
+        //            ])
+        //            ->post($baseUrl . '/payments', $payload);
 
-        if ($response->failed()) {
-            Log::error('Ошибка получения статуса платежа', [
-                'payment_id' => $payment->id,
-                'error' => $response->body(),
-            ]);
-            return;
-        }
+        \Log::info('FetchPayment YooKasPaymServ 2 response', [
+            'response' => $response->json(),
+        ]);
+
+        //        if ($response->failed()) {
+        //            Log::error('Ошибка получения статуса платежа', [
+        //                'payment_id' => $payment->id,
+        //                'error' => $response->body(),
+        //            ]);
+        //            return;
+        //        }
 
         $data = $response->json();
 
@@ -155,11 +192,24 @@ class YooKassaPaymentService
         if ($data['status'] === 'succeeded') {
             $payment->paid_at = now();
             $payment->save();
+            $payment->load('order');
 
             $order = $payment->order;
-            if ($order->status !== Order::STATUS_PAID) {
+
+            //            \Log::info('FetchPayment YooKasPaymServ 3 order', [
+            //                'order' => $order,
+            //                'order status' => $order->status,
+            //            ]);
+
+            if ($order && $order->status !== Order::STATUS_PAID) {
                 $this->orderService->markAsPaid($order);
             }
+
+            \Log::info('FetchPayment YooKasPaymServ 4 order', [
+                'order' => $order,
+                'order status' => $order->status,
+            ]);
+
         } elseif ($data['status'] === 'canceled') {
             $payment->canceled_at = now();
             $payment->save();
@@ -203,7 +253,7 @@ class YooKassaPaymentService
                 'description' => $item->product->name ?? 'Товар',
                 'quantity' => (string) $item->quantity,
                 'amount' => [
-                    'value' => number_format($item->price, 2, '.', ''),
+                    'value' => number_format((float)$item->price, 2, '.', ''),
                     'currency' => 'RUB',
                 ],
                 'vat_code' => 2, // Без НДС (20% для России)

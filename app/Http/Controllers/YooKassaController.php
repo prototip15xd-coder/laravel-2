@@ -10,6 +10,7 @@ use App\Services\OrderService;
 use App\Services\YooKassaPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class YooKassaController extends Controller
 {
@@ -37,7 +38,7 @@ class YooKassaController extends Controller
     }
 
     public function webhook(
-        YooKassaRequest $request,
+        Request $request,  //YooKassaRequest
         YooKassaPaymentService $yooKassaService,
         OrderService $orderService
     ): JsonResponse {

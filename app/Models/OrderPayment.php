@@ -23,4 +23,9 @@ class OrderPayment extends Model
         'canceled_at',
         'error_message',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

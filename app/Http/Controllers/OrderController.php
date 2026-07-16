@@ -28,7 +28,7 @@ class OrderController extends Controller
 
         $orders = Order::query()
             ->where('user_id', Auth::id())
-            ->with(['items.product'])
+            ->with(['items.product', 'latestPayment'])
             ->orderByDesc('created_at')
             ->get();
 
@@ -45,11 +45,14 @@ class OrderController extends Controller
         $user = Auth::user();
 
         try {
+            \Log::info('1 store OrderController', ['request' => $request]);
             $service->createOrder(
                 $user,
                 $request->validated()['payment_method'],
                 $cart
             );
+
+
             return redirect()
                 ->route('orders.index')
                 ->with('success', 'Заказ создан.');
@@ -105,11 +108,6 @@ class OrderController extends Controller
 
     public function pay(Order $order, YooKassaPaymentService $paymentService): RedirectResponse
     {
-        \Log::info('pay() called', [
-            'order_id' => $order->id,
-            'order_status' => $order->status,
-            'user_id' => Auth::id(),
-        ]);
 
         if ($order->user_id !== Auth::id()) {
             abort(403);
@@ -120,9 +118,19 @@ class OrderController extends Controller
             return redirect()->route('orders.show', $order)
                 ->with('error', 'Этот заказ уже оплачен или отменён.');
         }
+        \Log::info('оплата 1: pay() payment OrderController', [
+            'order_id' => $order->id,
+            'order_status' => $order->status,
+        ]);
 
         // Создаём платёж
         $payment = $paymentService->createPaymentForOrder($order);
+
+        \Log::info('оплата 2: pay() payment OrderController', [
+            'order_id' => $order->id,
+            'order_status' => $order->status,
+            'payment' => $payment
+        ]);
 
         // Редиректим на YooKassa
         return redirect()->away($payment->confirmation_url);

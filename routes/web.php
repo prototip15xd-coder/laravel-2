@@ -15,6 +15,8 @@ use App\Http\Controllers\YooKassaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
+Route::post('/payments/yookassa/webhook', [YooKassaController::class, 'webhook'])->name('payments.yookassa.webhook');
+
 
 Route::middleware('guest')->group(function () {
     // registration
@@ -75,7 +77,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/verification-notification', [AuthController::class, 'send'])->name('verification.send');
     });
 
-    Route::post('/payments/yookassa/webhook', [YooKassaController::class, 'webhook'])->name('payments.yookassa.webhook');
+    //    Route::post('/payments/yookassa/webhook', [YooKassaController::class, 'webhook'])->name('payments.yookassa.webhook');
 
     Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 

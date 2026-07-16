@@ -71,7 +71,7 @@ class OrderService
             }
 
             $cart->clear();
-
+            \Log::info('4 createOrder OrderService', ['pay_Method' => $payment]);
             return $order;
         });
     }

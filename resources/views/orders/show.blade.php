@@ -72,8 +72,8 @@
                             <div class="d-flex gap-2 mt-4">
                                 <form method="POST" action="{{ route('orders.pay', $order) }}">
                                     @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="paid">
+{{--                                    @method('PATCH')--}}
+{{--                                    <input type="hidden" name="status" value="paid">--}}
                                     <button type="submit" class="btn btn-success">✅ Оплатить</button>
                                 </form>
 

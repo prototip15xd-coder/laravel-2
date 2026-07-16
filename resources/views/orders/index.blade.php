@@ -94,7 +94,7 @@
                             <div class="d-flex gap-2 flex-wrap">
                                 @if($order->payment_method === 'cash')
                                     {{-- Для наличных — локальная оплата и отмена --}}
-                                    <form method="POST" action="{{ route('orders.status.update', $order) }}">
+                                    <form method="POST" action="{{ route('orders.pay', $order) }}">
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="paid">
