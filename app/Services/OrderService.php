@@ -66,12 +66,13 @@ class OrderService
 
             if ($paymentMethod === 'yookassa') {
                 $payment = $this->yooKassaService->createPaymentForOrder($order);
-                // Внутри createPaymentForOrder() тоже должна быть транзакция
-                // Или она должна быть вызвана отдельно
             }
 
             $cart->clear();
-            \Log::info('4 createOrder OrderService', ['pay_Method' => $payment]);
+            \Log::info('4 createOrder OrderService', [
+                'pay_Method' => $paymentMethod,
+                'order' => $order,
+                ]);
             return $order;
         });
     }

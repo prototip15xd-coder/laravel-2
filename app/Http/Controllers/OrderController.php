@@ -45,7 +45,7 @@ class OrderController extends Controller
         $user = Auth::user();
 
         try {
-            \Log::info('1 store OrderController', ['request' => $request]);
+            //            \Log::info('1 store OrderController', ['request' => $request]);
             $service->createOrder(
                 $user,
                 $request->validated()['payment_method'],
@@ -118,9 +118,17 @@ class OrderController extends Controller
             return redirect()->route('orders.show', $order)
                 ->with('error', 'Этот заказ уже оплачен или отменён.');
         }
+
+        if ($order->payment_method === 'cash') {
+            $order->payment_method = 'yookassa';
+            $order->save();
+            // Можно добавить лог, что способ оплаты изменён
+        }
+
         \Log::info('оплата 1: pay() payment OrderController', [
             'order_id' => $order->id,
             'order_status' => $order->status,
+            'order_payment_method' => $order->payment_method,
         ]);
 
         // Создаём платёж

@@ -73,10 +73,10 @@ class YooKassaPaymentService
 
         $data = $response->json();
 
-        \Log::info('3 до обнов локального статуса createpaymentForOrder YooKassaPaymentService', [
-            'payment_status' => $payment->status,
-            'order_status' => $order->status,
-        ]);
+        //        \Log::info('3 до обнов локального статуса createpaymentForOrder YooKassaPaymentService', [
+        //            'payment_status' => $payment->status,
+        //            'order_status' => $order->status,
+        //        ]);
 
         // Обновляем локальную запись
         $payment->external_payment_id = $data['id'];
@@ -84,10 +84,10 @@ class YooKassaPaymentService
         $payment->confirmation_url = $data['confirmation']['confirmation_url'];
         $payment->save();
 
-        \Log::info('4 после обнов локального статуса createpaymentForOrder YooKassaPaymentService', [
-            'payment_status' => $payment->status,
-            'order_status' => $order->status,
-        ]);
+        //        \Log::info('4 после обнов локального статуса createpaymentForOrder YooKassaPaymentService', [
+        //            'payment_status' => $payment->status,
+        //            'order_status' => $order->status,
+        //        ]);
 
         return $payment;
     }
@@ -193,16 +193,11 @@ class YooKassaPaymentService
             $payment->paid_at = now();
             $payment->save();
             $payment->load('order');
-
             $order = $payment->order;
 
-            //            \Log::info('FetchPayment YooKasPaymServ 3 order', [
-            //                'order' => $order,
-            //                'order status' => $order->status,
-            //            ]);
-
             if ($order && $order->status !== Order::STATUS_PAID) {
-                $this->orderService->markAsPaid($order);
+                $orderService = app(OrderService::class);
+                $orderService->markAsPaid($order);
             }
 
             \Log::info('FetchPayment YooKasPaymServ 4 order', [
@@ -262,19 +257,47 @@ class YooKassaPaymentService
             ];
         }
 
+        //        $payload = [
+        //            'payment_id' => $payment->external_payment_id,
+        //            'type' => 'payment',
+        //            'items' => $items,
+        //            'tax_system_code' => 1,
+        //            'customer' => [
+        //                'email' => $order->user->email,
+        //            ],
+        //            'send' => true,
+        //        ];
+
         $payload = [
             'payment_id' => $payment->external_payment_id,
+            'type' => 'payment',
             'items' => $items,
             'tax_system_code' => 1,
             'customer' => [
                 'email' => $order->user->email,
             ],
             'send' => true,
+            'settlements' => [
+                [
+                    'type' => 'cashless',
+                    'amount' => [
+                        'value' => number_format((float)$order->total, 2, '.', ''),
+                        'currency' => 'RUB',
+                    ],
+                ],
+            ],
         ];
 
-        // Отправляем запрос на создание чека
-        $response = Http::withBasicAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'))
-            ->post('https://api.yookassa.ru/v3/receipts', $payload);
+        //        // Отправляем запрос на создание чека
+        //        $response = Http::withBasicAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'))
+        //            ->post('https://api.yookassa.ru/v3/receipts', $payload);
+
+        $response = Http::withBasicAuth(
+            config('services.yookassa.shop_id'),
+            config('services.yookassa.secret_key')
+        )->withHeaders([
+            'Idempotence-Key' => \Illuminate\Support\Str::uuid()->toString(),
+        ])->post('https://api.yookassa.ru/v3/receipts', $payload);
 
         // Сохраняем в базу
         $receipt = PaymentReceipt::create([
