@@ -25,19 +25,19 @@ class ProductStoreRequest extends FormRequest
         ];
     }
 
-    public function fromRequest(FormRequest $request): self
-    {
-        $validated = $request->validated();
-
-        return new self(
-            $request->validated('name'),
-            $request->validated('price'),
-            $request->validated('stock'),
-            $request->validated('sku'),
-            $request->validated('status'),
-            $request->validated('category_id'),
-        );
-
-    }
+    //    public function fromRequest(FormRequest $request): self
+    //    {
+    //        $validated = $request->validated();
+    //
+    //        return new self(
+    //            $request->validated('name'),
+    //            $request->validated('price'),
+    //            $request->validated('stock'),
+    //            $request->validated('sku'),
+    //            $request->validated('status'),
+    //            $request->validated('category_id'),
+    //        );
+    //
+    //    }
 
 }

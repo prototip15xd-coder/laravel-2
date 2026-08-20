@@ -45,6 +45,37 @@ services:
     networks:
         - app-network
 
+  scheduler:
+    build:
+        context: .
+        dockerfile: docker/php/Dockerfile
+    working_dir: /var/www/html
+    command: php artisan schedule:work
+    restart: always
+    volumes:
+        - .:/var/www/html
+    depends_on:
+        - php-fpm
+        - postgres
+        - rabbitmq
+
+  reports-worker:
+      build:
+          context: .
+          dockerfile: docker/php/Dockerfile
+      working_dir: /var/www/html
+      command: >
+          php artisan queue:work rabbitmq
+          --queue=orders.reports.sales
+          --tries=3
+          --sleep=2
+      restart: always
+      volumes:
+          - .:/var/www/html
+      depends_on:
+          - php-fpm
+          - rabbitmq
+
 networks:
     app-network:
         driver: bridge

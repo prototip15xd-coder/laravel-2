@@ -82,9 +82,7 @@ class AuthController
     public function updateProfile(UpdateProfileRequest $request): RedirectResponse
     {
         $dto = UpdateProfileDto::fromRequest($request);
-        $user = $this
-            ->userService
-            ->updateProfile($dto);
+        $this->userService->updateProfile($dto);
 
         return redirect()->route('profile.form');
     }

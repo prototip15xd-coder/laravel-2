@@ -58,10 +58,9 @@ class UserService
         $user->save();
     }
 
-    public function SendRegistrationVerificationJob()
+    public function sendVerificationNotification(User $user): void
     {
-        $this->notify(new VerifyEmailNotification());
-
+        $user->notify(new VerifyEmailNotification());
     }
 
 }

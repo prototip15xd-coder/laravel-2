@@ -7,89 +7,58 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\PaymentReceipt;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use YooKassa\Client;
+use YooKassa\Common\Exceptions\ApiException;
 
 class YooKassaPaymentService
 {
-    public function __construct(
-    ) {
+    private Client $client;
+
+    public function __construct()
+    {
+        $this->client = new Client();
+
+        $this->client->setAuth(
+            config('services.yookassa.shop_id'),
+            config('services.yookassa.secret_key')
+        );
     }
 
     public function createPaymentForOrder(Order $order): OrderPayment
     {
-        if ($order->payment_method === 'cash') {
-            throw new \Exception('Оплата наличными не требует создания платежа в YooKassa.');
-        }
-
-        $payment = OrderPayment::create([
-            'order_id' => $order->id,
-            'provider' => 'YooKassa',
-            'status' => $order->status,
-            'amount' => $order->total,
-            'currency' => 'RUB', ///точно? как работать с валютой оплаты
-        ]);
+        $idempotenceKey = (string) Str::uuid();
 
         $payload = [
             'amount' => [
-                'value' => number_format((float)$order->total, 2, '.', ''),
-                'currency' => 'RUB',
+                'value' => number_format((float) $order->total, 2, '.', ''),
+                'currency' => config('services.yookassa.currency', 'RUB'),
             ],
             'capture' => true,
             'confirmation' => [
                 'type' => 'redirect',
-                'return_url' => route('orders.show', $order),
+                'return_url' => route('payments.yookassa.return', $order),
             ],
-            'description' => "Заказ №{$order->id}",
+            'description' => 'Оплата заказа #' . $order->id,
             'metadata' => [
                 'order_id' => $order->id,
-                'payment_id' => $payment->id,
             ],
         ];
 
-        // Отправляем запрос в YooKassa
-        //        $response = Http::withBasicAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'))
-        //            ->post('https://api.yookassa.ru/v3/payments', $payload);
+        $response = $this->client->createPayment($payload, $idempotenceKey);
 
-        $response = Http::withBasicAuth(
-            config('services.yookassa.shop_id'),
-            config('services.yookassa.secret_key')
-        )->withHeaders([
-            'Idempotence-Key' => Str::uuid()->toString(),
-        ])->post('https://api.yookassa.ru/v3/payments', $payload);
-
-
-        // Сохраняем запрос и ответ
-        $payment->request_payload = $payload;
-        $payment->response_payload = $response->json();
-
-        if ($response->failed()) {
-            $payment->status = 'canceled';
-            $payment->error_message = $response->body();
-            $payment->save();
-            throw new \Exception('Ошибка создания платежа: ' . $response->body());
-        }
-
-        $data = $response->json();
-
-        //        \Log::info('3 до обнов локального статуса createpaymentForOrder YooKassaPaymentService', [
-        //            'payment_status' => $payment->status,
-        //            'order_status' => $order->status,
-        //        ]);
-
-        // Обновляем локальную запись
-        $payment->external_payment_id = $data['id'];
-        $payment->status = $data['status'];
-        $payment->confirmation_url = $data['confirmation']['confirmation_url'];
-        $payment->save();
-
-        //        \Log::info('4 после обнов локального статуса createpaymentForOrder YooKassaPaymentService', [
-        //            'payment_status' => $payment->status,
-        //            'order_status' => $order->status,
-        //        ]);
-
-        return $payment;
+        return OrderPayment::create([
+            'order_id' => $order->id,
+            'provider' => 'yookassa',
+            'status' => $response->getStatus(),
+            'amount' => $order->total,
+            'currency' => config('services.yookassa.currency', 'RUB'),
+            'external_payment_id' => $response->getId(),
+            'idempotence_key' => $idempotenceKey,
+            'confirmation_url' => $response->getConfirmation()?->getConfirmationUrl(),
+            'response_payload' => $response->jsonSerialize(),
+        ]);
     }
 
     public function handleWebhook(array $webhookData): void
@@ -157,39 +126,15 @@ class YooKassaPaymentService
         if (!$payment->external_payment_id) {
             throw new \Exception('У платежа нет external_payment_id');
         }
-        \Log::info('FetchPayment YooKasPaymServ 1', [
-            'shop_id' => config('services.yookassa.shop_id'),
-            'secret_key' => config('services.yookassa.secret_key') ? 'set' : 'not set',
-        ]);
 
-        $response = Http::withBasicAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'))
-            ->get("https://api.yookassa.ru/v3/payments/{$payment->external_payment_id}");
-        //
-        //        $response = Http::withBasicAuth($shopId, $secretKey)
-        //            ->withHeaders([
-        //                'Idempotence-Key' => $idempotenceKey,
-        //            ])
-        //            ->post($baseUrl . '/payments', $payload);
+        $response = $this->client->getPaymentInfo($payment->external_payment_id);
 
-        \Log::info('FetchPayment YooKasPaymServ 2 response', [
-            'response' => $response->json(),
-        ]);
-
-        //        if ($response->failed()) {
-        //            Log::error('Ошибка получения статуса платежа', [
-        //                'payment_id' => $payment->id,
-        //                'error' => $response->body(),
-        //            ]);
-        //            return;
-        //        }
-
-        $data = $response->json();
 
         // Обновляем локальный статус
-        $payment->status = $data['status'];
-        $payment->response_payload = $data;
+        $payment->status = $response->getStatus();
+        $payment->response_payload = $response->jsonSerialize();
 
-        if ($data['status'] === 'succeeded') {
+        if ($response->getStatus() === 'succeeded') {
             $payment->paid_at = now();
             $payment->save();
             $payment->load('order');
@@ -205,7 +150,7 @@ class YooKassaPaymentService
                 'order status' => $order->status,
             ]);
 
-        } elseif ($data['status'] === 'canceled') {
+        } elseif ($response->getStatus() === 'canceled') {
             $payment->canceled_at = now();
             $payment->save();
         } else {
@@ -215,7 +160,7 @@ class YooKassaPaymentService
 
     public function synchronizePayment(OrderPayment $payment): void
     {
-        Log::info('Синхронизация платежа', ['payment_id' => $payment->id]);
+        //        Log::info('Синхронизация платежа', ['payment_id' => $payment->id]);
 
         if (!$payment->external_payment_id) {
             Log::warning('Платеж не имеет external_payment_id, пропускаем', ['payment_id' => $payment->id]);
@@ -241,7 +186,7 @@ class YooKassaPaymentService
     {
         $order = $payment->order;
 
-        // Собираем товары для чека
+        // Формируем items как раньше
         $items = [];
         foreach ($order->items as $item) {
             $items[] = [
@@ -251,22 +196,11 @@ class YooKassaPaymentService
                     'value' => number_format((float)$item->price, 2, '.', ''),
                     'currency' => 'RUB',
                 ],
-                'vat_code' => 2, // Без НДС (20% для России)
+                'vat_code' => 2,
                 'payment_mode' => 'full_payment',
                 'payment_subject' => 'commodity',
             ];
         }
-
-        //        $payload = [
-        //            'payment_id' => $payment->external_payment_id,
-        //            'type' => 'payment',
-        //            'items' => $items,
-        //            'tax_system_code' => 1,
-        //            'customer' => [
-        //                'email' => $order->user->email,
-        //            ],
-        //            'send' => true,
-        //        ];
 
         $payload = [
             'payment_id' => $payment->external_payment_id,
@@ -288,46 +222,45 @@ class YooKassaPaymentService
             ],
         ];
 
-        //        // Отправляем запрос на создание чека
-        //        $response = Http::withBasicAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'))
-        //            ->post('https://api.yookassa.ru/v3/receipts', $payload);
-
-        $response = Http::withBasicAuth(
+        $client = new Client();
+        $client->setAuth(
             config('services.yookassa.shop_id'),
             config('services.yookassa.secret_key')
-        )->withHeaders([
-            'Idempotence-Key' => \Illuminate\Support\Str::uuid()->toString(),
-        ])->post('https://api.yookassa.ru/v3/receipts', $payload);
+        );
 
-        // Сохраняем в базу
-        $receipt = PaymentReceipt::create([
-            'order_payment_id' => $payment->id,
-            'type' => 'payment',
-            'status' => $response->successful() ? 'succeeded' : 'pending',
-            'send_to_customer' => true,
-            'request_payload' => $payload,
-            'response_payload' => $response->json(),
-            'error_message' => $response->failed() ? $response->body() : null,
-        ]);
-
-        if ($response->failed()) {
-            $receipt->status = 'canceled';
-            $receipt->error_message = $response->body();
-            $receipt->save();
-
-            Log::error('Ошибка создания чека', [
+        try {
+            $receiptObject = $client->createReceipt($payload, Str::uuid()->toString());
+        } catch (ApiException $e) {
+            Log::error('Ошибка создания чека (SDK)', [
                 'payment_id' => $payment->id,
-                'error' => $response->body(),
+                'error' => $e->getMessage(),
+            ]);
+            // Сохраняем ошибку в локальную запись
+            $receipt = PaymentReceipt::create([
+                'order_payment_id' => $payment->id,
+                'type' => 'payment',
+                'status' => 'canceled',
+                'send_to_customer' => true,
+                'request_payload' => $payload,
+                'response_payload' => null,
+                'error_message' => $e->getMessage(),
             ]);
             return;
         }
 
-        $data = $response->json();
-        $receipt->external_receipt_id = $data['id'];
-        $receipt->status = $data['status'];
-        $receipt->save();
+        // Сохраняем успешный чек
+        $receipt = PaymentReceipt::create([
+            'order_payment_id' => $payment->id,
+            'type' => 'payment',
+            'status' => $receiptObject->getStatus(),
+            'send_to_customer' => true,
+            'request_payload' => $payload,
+            'response_payload' => $receiptObject->toArray(),
+            'external_receipt_id' => $receiptObject->getId(),
+            'error_message' => null,
+        ]);
 
-        Log::info('Чек создан', ['receipt_id' => $receipt->id, 'external_id' => $receipt->external_receipt_id]);
+        Log::info('Чек создан (SDK)', ['receipt_id' => $receipt->id]);
     }
 
 }

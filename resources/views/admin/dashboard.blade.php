@@ -64,6 +64,142 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="text-muted">
+                                                Последнее обновление:
+                                            </div>
+
+                                            <div class="fs-3 fw-bold">
+                                                {{ $report['calculated_at'] }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                    <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="text-muted">
+                                                Всего заказов
+                                            </div>
+
+                                            <div class="fs-3 fw-bold">
+                                                {{ $report['orders_count'] }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="text-muted">
+                                                Успешных продаж
+                                            </div>
+
+                                            <div class="fs-3 fw-bold">
+                                                {{ $report['sales_count'] }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="text-muted">
+                                                Выручка
+                                            </div>
+
+                                            <div class="fs-3 fw-bold">
+                                                {{ number_format(
+                                                    $report['revenue'],
+                                                    2,
+                                                    ',',
+                                                    ' '
+                                                ) }} ₽
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="text-muted">
+                                                Отменено
+                                            </div>
+
+                                            <div class="fs-3 fw-bold">
+                                                {{ $report['canceled_count'] }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table table-striped align-middle mt-4">
+                                <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Заказов</th>
+                                    <th>Продаж</th>
+                                    <th>Выручка</th>
+                                    <th>Средняя выручка за день</th>
+                                    <th>Заказов в процессе оформления</th>
+                                    <th>Отменено</th>
+                                    <th>Пересчитано</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                @forelse($report['daily_reports'] as $dailyReport)
+                                    <tr>
+                                        <td>
+                                            {{ $dailyReport->report_date->format('d.m.Y') }}
+                                        </td>
+
+                                        <td>
+                                            {{ $dailyReport->orders_count }}
+                                        </td>
+
+                                        <td>
+                                            {{ $dailyReport->sales_count }}
+                                        </td>
+
+                                        <td>
+                                            {{ number_format(
+                                                (float) $dailyReport->revenue,
+                                                2,
+                                                ',',
+                                                ' '
+                                            ) }} ₽
+                                        </td>
+                                        <td>
+                                            {{ $dailyReport->average_order_value }}
+                                        </td>
+                                        <td>
+                                            {{ $dailyReport->pending_orders_count }}
+                                        </td>
+                                        <td>
+                                            {{ $dailyReport->canceled_count }}
+                                        </td>
+
+                                        <td>
+                                            {{ $dailyReport->calculated_at?->format('d.m.Y H:i') }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            Отчёты ещё не сформированы.
+                                            Запустите Scheduler и queue worker.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

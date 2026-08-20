@@ -6,6 +6,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property-read Order $order
+ */
 class OrderPayment extends Model
 {
     protected $fillable = [

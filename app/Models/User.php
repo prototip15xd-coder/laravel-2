@@ -19,6 +19,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $email
  * @property string $phone
  * @property string $password
+ * @property string $role
  *
  * @property-read string $full_name
  *
@@ -43,6 +44,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'email_verified_at',
         'phone',
+        'role_id',
         'password'
     ];
 

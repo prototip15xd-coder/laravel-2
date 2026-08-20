@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libcurl4-openssl-dev \
     libonig-dev \
-    sockets \
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j$(nproc) \
         intl \
@@ -24,6 +23,7 @@ RUN apt-get update && apt-get install -y \
         xml \
         bcmath \
         mbstring \
+        sockets  \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Xdebug
@@ -42,5 +42,4 @@ COPY --chown=www-data:www-data . .
 
 USER www-data
 
-RUN pecl install xdebug && docker-php-ext-enable xdebug
-
+RUN if ! pecl list | grep xdebug; then pecl install xdebug; fi && docker-php-ext-enable xdebug

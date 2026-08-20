@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -33,6 +34,7 @@ class OrderService
             ]);
         }
 
+        /** @var Address $address */
         $address = $user->addresses()
             ->where('is_default', true)
             ->first();

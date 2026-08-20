@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notifiable;
  * @property float $price
  * @property string $image
  * @property integer $category_id
+ * @property-read Category $category
  */
 class Product extends Model
 {

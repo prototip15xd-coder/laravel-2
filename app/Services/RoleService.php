@@ -25,10 +25,10 @@ class RoleService
 
     }
 
-    public function delete(RoleRequest $request, ...$roles)
+    public function delete(RoleRequest $request, Role $role): void
     {
         if (in_array($role->slug, Role::getSystemRoles())) {
-            throw new Exception('Нельзя удалить системную роль');
+            throw new \Exception('Нельзя удалить системную роль');
         }
 
     }

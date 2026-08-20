@@ -19,7 +19,7 @@ class AdminProductController extends Controller
     public function index(): View
     {
         $products = Product::query()
-            ->with('category')
+            ->with('category_id')
             ->orderByDesc('created_at')
             ->get();
 

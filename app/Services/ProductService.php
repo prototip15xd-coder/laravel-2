@@ -18,7 +18,7 @@ class ProductService
      * Подготовка данных для страницы товара.
      * Сейчас здесь минимум логики, но далее мы будем расширять.
      */
-    public function getProductPageData(Product $product): array
+    public function getProductPageData(Product $product): Product
     {
         // В будущем тут могут быть:
         // - проверка статуса (active/inactive)

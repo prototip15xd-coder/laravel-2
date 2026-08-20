@@ -1,0 +1,121 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \$request of method App\\DTO\\Auth\\UpdateProfileDto\:\:fromRequest\(\) has invalid type App\\Http\\Requests\\PasswordUpdateRequest\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/DTO/Auth/UpdateProfileDto.php
+
+		-
+			message: '#^Call to static method info\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/Auth/AuthController.php
+
+		-
+			message: '#^Call to static method info\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 2
+			path: app/Http/Controllers/OrderController.php
+
+		-
+			message: '#^Call to an undefined static method App\\DTO\\ProductDTO\:\:fromRequest\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Call to static method error\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Job/SendWelcomeAfterVerificationJob.php
+
+		-
+			message: '#^Call to static method info\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 2
+			path: app/Http/Job/SendWelcomeAfterVerificationJob.php
+
+		-
+			message: '#^Access to undefined constant App\\Models\\Order\:\:PAYMENT_METHOD_CARD\.$#'
+			identifier: classConstant.notFound
+			count: 1
+			path: app/Http/Requests/Admin/OrderUpdateRequest.php
+
+		-
+			message: '#^Attribute class App\\Models\\Fillable does not exist\.$#'
+			identifier: attribute.notFound
+			count: 1
+			path: app/Models/PasswordResetToken.php
+
+		-
+			message: '#^Attribute class App\\Models\\Hidden does not exist\.$#'
+			identifier: attribute.notFound
+			count: 1
+			path: app/Models/PasswordResetToken.php
+
+		-
+			message: '#^Attribute class App\\Models\\Fillable does not exist\.$#'
+			identifier: attribute.notFound
+			count: 1
+			path: app/Models/Sessions.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Sessions\:\:belongsTo\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Sessions.php
+
+		-
+			message: '#^Call to static method info\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Notifications/WelcomeMailNotification.php
+
+		-
+			message: '#^Call to static method random\(\) on an unknown class App\\Services\\Admin\\Str\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Services/Admin/AdminUserService.php
+
+		-
+			message: '#^Call to an undefined method App\\Services\\Auth\\UserService\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/Auth/UserService.php
+
+		-
+			message: '#^Call to static method error\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Services/Notification/UserNotificationService.php
+
+		-
+			message: '#^Call to static method info\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 2
+			path: app/Services/Notification/UserNotificationService.php
+
+		-
+			message: '#^Call to static method info\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Services/OrderService.php
+
+		-
+			message: '#^Instantiated class App\\Services\\Exception not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Services/RoleService.php
+
+		-
+			message: '#^Undefined variable\: \$role$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/RoleService.php
+
+		-
+			message: '#^Call to static method info\(\) on an unknown class Log\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Services/YooKassaPaymentService.php

@@ -55,7 +55,7 @@ class AdminController extends Controller
     public function index(): View
     {
         $users = User::query()
-            ->with('roles')
+            ->with('role')
             ->orderByDesc('created_at')
             ->get();
 

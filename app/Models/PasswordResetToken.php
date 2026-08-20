@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['email', 'token'])]
-#[Hidden(['token'])]
 class PasswordResetToken extends Model //или Authenticatable?
 {
     use HasFactory;

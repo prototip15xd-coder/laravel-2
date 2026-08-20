@@ -27,7 +27,7 @@ class OrderUpdateRequest extends FormRequest
             ])],
             'payment_method' => ['required', Rule::in([
                 Order::PAYMENT_METHOD_CASH,
-                Order::PAYMENT_METHOD_CARD,
+                Order::PAYMENT_METHOD_YOOKASSA,
             ])],
             'shipping_address' => ['nullable', 'string', 'max:500'],
             'total' => ['nullable', 'numeric', 'min:0'],

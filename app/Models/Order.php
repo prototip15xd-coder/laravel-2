@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $status
  * @property string $payment_method
  * @property string $shipping_address
+ * @property string $items
  */
 class Order extends Model
 {
@@ -48,7 +49,8 @@ class Order extends Model
         'total',
         'status',
         'payment_method',
-        'shipping_address'
+        'shipping_address',
+        'items'
     ];
 
     public function items()

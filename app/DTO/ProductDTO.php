@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\Http\Requests\ProductStoreRequest;
 use Spatie\LaravelData\Data;
 
 class ProductDTO extends Data
@@ -31,5 +32,19 @@ class ProductDTO extends Data
         ];
     }
 
+    public function fromRequest(ProductStoreRequest $request): self
+    {
+        //$validated = $request->validated();
 
+        return new self(
+            $request->validated('name'),
+            $request->validated('price'),
+            $request->validated('stock'),
+            $request->validated('sku'),
+            $request->validated('status'),
+            $request->validated('category_id'),
+            $request->validated('image'),
+        );
+
+    }
 }
