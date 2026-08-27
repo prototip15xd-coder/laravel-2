@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Http\Interface\CartServiceInterface;
 use App\Models\Product;
 
-class SessionCartService
+class SessionCartService implements CartServiceInterface
 {
     private const string SESSION_KEY = 'cart.items';
 

@@ -13,7 +13,8 @@ return new class () extends Migration {
     public function up(): void
     {
         // Создаём ENUM тип в PostgreSQL
-        DB::statement("CREATE TYPE cart_status AS ENUM ('active', 'ordered', 'abandoned')");
+        //DB::statement("CREATE TYPE cart_status AS ENUM ('active', 'ordered', 'abandoned')");
+        $this->createEnumIfNotExists('cart_status', ['active', 'ordered', 'abandoned']);
 
         Schema::create('carts', function (Blueprint $table) {
             $table->id()->comment('Первичный ключ корзины');
@@ -23,6 +24,24 @@ return new class () extends Migration {
                 ->comment('Статус корзины: active, ordered, abandoned');
             $table->timestamps();
         });
+    }
+
+    private function createEnumIfNotExists(string $enumName, array $values): void
+    {
+        // Проверяем существование ENUM
+        /** @var \stdClass $result */
+        $exists = DB::selectOne("
+            SELECT EXISTS (
+                SELECT 1
+                FROM pg_type
+                WHERE typname = ?
+            ) as exists
+        ", [$enumName]);
+
+        if (!$exists->exists) {
+            $valuesList = implode("', '", $values);
+            DB::statement("CREATE TYPE {$enumName} AS ENUM ('{$valuesList}')");
+        }
     }
 
     public function down(): void

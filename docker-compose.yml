@@ -30,6 +30,8 @@ services:
       - ./docker/php/Xdebug.ini:/usr/local/etc/php/conf.d/docker-php-xdebug.ini
     networks:
         - app-network
+    depends_on:
+        - postgres
 
 
   postgres:

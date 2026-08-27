@@ -4,13 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-#[Fillable([
-    'user_id',
-    'ip_address',
-    'user_agent',
-    'payload',
-    'last_activity'
-])]
+use Illuminate\Database\Eloquent\Model;
 
 class Sessions extends Model
 {

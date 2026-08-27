@@ -13,7 +13,8 @@ return new class () extends Migration {
     public function up(): void
     {
         // ENUM тип для статуса заказа
-        DB::statement("CREATE TYPE order_status AS ENUM ('pending', 'paid', 'shipped', 'completed', 'canceled')");
+        //DB::statement("CREATE TYPE order_status AS ENUM ('pending', 'paid', 'shipped', 'completed', 'canceled')");
+        $this->createEnumIfNotExists('order_status', ['pending', 'paid', 'shipped', 'completed', 'canceled']);
 
         Schema::create('orders', function (Blueprint $table) {
             $table->id()->comment('Первичный ключ заказа');
@@ -25,6 +26,24 @@ return new class () extends Migration {
             $table->text('shipping_address')->nullable()->comment('Адрес доставки');
             $table->timestamps();
         });
+    }
+
+    private function createEnumIfNotExists(string $enumName, array $values): void
+    {
+        // Проверяем существование ENUM
+        /** @var \stdClass $result */
+        $exists = DB::selectOne("
+            SELECT EXISTS (
+                SELECT 1
+                FROM pg_type
+                WHERE typname = ?
+            ) as exists
+        ", [$enumName]);
+
+        if (!$exists->exists) {
+            $valuesList = implode("', '", $values);
+            DB::statement("CREATE TYPE {$enumName} AS ENUM ('{$valuesList}')");
+        }
     }
 
     public function down(): void

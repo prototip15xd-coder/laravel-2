@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer $product_id
  * @property integer $quantity
  * @property float $price
+ * @property-read Product $product
  */
 class OrderItem extends Model
 {

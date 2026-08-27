@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Services\DatabseCartService;
 use App\Services\SessionCartService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class CartController extends Controller
 {
     public function __construct(
         private readonly SessionCartService $sessionCartService,
+        private readonly DatabseCartService $databaseCartService,
     ) {
     }
 
@@ -45,7 +47,12 @@ class CartController extends Controller
             'quantity' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $this->sessionCartService->add($product, (int) ($data['quantity'] ?? 1));
+        if (Auth::check()) {
+            $this->databaseCartService->add($product, (int) ($data['quantity'] ?? 1));
+        } else {
+            $this->sessionCartService->add($product, (int) ($data['quantity'] ?? 1));
+        }
+
 
         return $this->respond($request);
     }

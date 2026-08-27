@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,7 +14,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $status
  * @property string $payment_method
  * @property string $shipping_address
- * @property string $items
+ * @property-read Collection<int, OrderItem> $items
+ * @property-read User $user
+ * @property-read Collection<int, OrderPayment> $payments
  */
 class Order extends Model
 {

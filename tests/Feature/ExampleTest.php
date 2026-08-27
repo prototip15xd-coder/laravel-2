@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace tests\Feature;
+namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
-use tests\TestCase;
+use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
