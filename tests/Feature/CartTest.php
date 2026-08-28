@@ -45,4 +45,23 @@ class CartTest extends TestCase
             'quantity' => 2,
         ]);
     }
+
+    public function test_cost_of_cart(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['price' => 1500]);
+
+        $response = $this->actingAs($user)
+            ->post("/cart/items/{$product->id}", [
+                'quantity' => 2,
+            ]);
+
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('cart_items', [
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'price' => $product->price,
+        ]);
+    }
 }
