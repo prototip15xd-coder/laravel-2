@@ -1,31 +1,31 @@
 <div class="col">
     <div class="card h-100">
-        @if($product->image)
+        @if($product['image'])
             <div>
-                <a href="{{ route("products.show", $product) }}">
-                    <img src="storage/{{$product->image }}"
+                <a href="{{ route("products.show", $product['id']) }}">
+                    <img src="storage/{{$product['image']}}"
                          class="card-img-top"
-                         alt="{{ $product->name }}">
+                         alt="{{ $product['name'] }}">
                 </a>
             </div>
         @else
             <div class="card-img-top d-flex align-items-center justify-content-center bg-light"
                  style="height: 180px;">
-                <a href="{{ route("products.show", $product) }}">
+                <a href="{{ route("products.show", $product['id']) }}">
                     <span class="text-muted">Нет изображения</span>
                 </a>
             </div>
         @endif
         <div class="text-muted">
-            Категория: {{ $product->category?->name ?? 'Без категории' }}
+            Категория: {{ $product['category']['name']  ?? 'Без категории' }}
         </div>
 
         <div class="card-body d-flex flex-column">
-            <h5 class="card-title">{{ $product->name }}</h5>
-            <p class="fw-semibold mb-3">{{ number_format($product->price, 0, ',', ' ') }} ₽</p>
+            <h5 class="card-title">{{ $product['name'] }}</h5>
+            <p class="fw-semibold mb-3">{{ number_format($product['price'], 0, ',', ' ') }} ₽</p>
 
             <form method="POST"
-                  action="{{ route('cart.items.store', $product) }}"
+                  action="{{ route('cart.items.store', $product['id']) }}"
                   class="d-inline mt-2">
                 @csrf
                 <input type="hidden" name="quantity" value="1">

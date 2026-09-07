@@ -12,13 +12,13 @@
 
                         <form method="POST" action="{{ route('password.update') }}">
                             @csrf
-                            @method('PATCH')
+                            @method('POST')
 
                             <div class="row g-2 g-md-3">
                                 <div class="col-12 col-md-6">
                                     <div class="mb-2 mb-md-3">
                                         <label for="current_password" class="form-label small">Текущий пароль</label>
-                                        <input type="text"
+                                        <input type="password"
                                                name="current_password"
                                                id="current__password"
                                                class="form-control @error('current_password') is-invalid @enderror">
@@ -33,7 +33,7 @@
                                 <div class="col-12 col-md-6">
                                     <div class="mb-2 mb-md-3">
                                         <label for="new_password" class="form-label small">Новый пароль</label>
-                                        <input type="text"
+                                        <input type="password"
                                                name="new_password"
                                                id="new_password"
                                                class="form-control @error('new_password') is-invalid @enderror">
@@ -47,12 +47,12 @@
                             <div class="row g-2 g-md-3">
                                 <div class="col-12 col-md-6">
                                     <div class="mb-2 mb-md-3">
-                                        <label for="new_password" class="form-label small">Повторите пароль</label>
-                                        <input type="text"
-                                               name="new_password"
-                                               id="new_password"
-                                               class="form-control @error('new_password') is-invalid @enderror">
-                                        @error('new_password')
+                                        <label for="new_password_confirmation" class="form-label small">Повторите пароль</label>
+                                        <input type="password"
+                                               name="new_password_confirmation"
+                                               id="new_password_confirmation"
+                                               class="form-control @error('new_password_confirmation') is-invalid @enderror">
+                                        @error('new_password_confirmation')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>

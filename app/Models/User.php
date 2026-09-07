@@ -19,12 +19,11 @@ use Illuminate\Notifications\Notifiable;
  * @property string $email
  * @property string $phone
  * @property string $password
- * @property string $role
- *
- * @property-read string $full_name
  *
  * @property Collection|Order[] $orders
  * @property Collection|Cart[] $carts
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
  */
 
 class User extends Authenticatable implements MustVerifyEmail

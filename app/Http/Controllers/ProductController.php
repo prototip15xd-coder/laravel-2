@@ -18,17 +18,28 @@ class ProductController extends Controller
     ) {
     }
 
+    //    public function index(ProductFilterRequest $request)
+    //    {
+    //        // 1) Из validated данных собираем DTO
+    //        $dto = ProductFilterDto::fromRequest($request);
+    //
+    //        // 2) Сервис строит запрос
+    //        $products = $this->productService->getProducts($dto);
+    //
+    //        // 3) Для подсказки диапазона цен (placeholder)
+    //        $maxProductPrice  = $this->productService->getMaxProductPrice();
+    //
+    //        return view('products.index', compact('products', 'dto', 'maxProductPrice'));
+    //    }
+
     public function index(ProductFilterRequest $request)
     {
-        // 1) Из validated данных собираем DTO
         $dto = ProductFilterDto::fromRequest($request);
 
-        // 2) Сервис строит запрос
-        $products = $this->productService->getProducts($dto);
+        $products = $this->productService->getCachedProducts($dto, $request->get('page', 1));
+        $maxProductPrice = $this->productService->getMaxProductPrice();
 
-        // 3) Для подсказки диапазона цен (placeholder)
-        $maxProductPrice  = $this->productService->getMaxProductPrice();
-
+        //          dd($products);
         return view('products.index', compact('products', 'dto', 'maxProductPrice'));
     }
 

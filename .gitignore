@@ -28,4 +28,5 @@ docker/postgres/
 .php-cs-fixer.cache
 /php-cs-fixer.cache
 .docker/postgres/data/
+docker/redis/data/
 

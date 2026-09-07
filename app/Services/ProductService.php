@@ -7,13 +7,15 @@ namespace App\Services;
 use App\DTO\ProductDTO;
 use App\DTO\ProductFilterDto;
 use App\Models\Product;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
+//use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+//use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
     private const array PER_PAGE_OPTIONS = [10, 25, 50, 100];
-
     /**
      * Подготовка данных для страницы товара.
      * Сейчас здесь минимум логики, но далее мы будем расширять.
@@ -118,11 +120,6 @@ class ProductService
         return $query->paginate($dto->per_page)->withQueryString();
     }
 
-    public function getMaxProductPrice(): int
-    {
-        return (int) (Product::query()->max('price') ?? 0);
-    }
-
     public function getProductsByCategoryId(int $categoryId, ProductFilterDto $dto)
     {
         $query = Product::query()
@@ -169,6 +166,51 @@ class ProductService
         }
 
         $product->delete();
+    }
+
+    public function getCachedProducts(ProductFilterDto $dto, int $page = 1): LengthAwarePaginator
+    {
+        $key = 'catalog_' . md5(json_encode([
+                'page' => $page,
+                'q' => $dto->q,
+                'min_price' => $dto->min_price,
+                'max_price' => $dto->max_price,
+                'in_stock' => $dto->in_stock,
+                'sort' => $dto->sort,
+                'per_page' => $dto->per_page,
+            ]));
+        //кешируем массив
+        $data = Cache::remember($key, 600, function () use ($dto, $page) {
+            // Получаем пагинатор
+            $result = $this->getProducts($dto);
+            $items = $result->items(); // массив объектов
+
+            return [
+                // Нужно превратить в массив массивов:
+                'data' => array_map(fn ($item) => $item->toArray(), $items),
+                'total' => $result->total(),
+                'per_page' => $result->perPage(),
+                'current_page' => $page,
+                'last_page' => $result->lastPage(),
+            ];
+        });
+
+        $result = new LengthAwarePaginator(
+            $data['data'],
+            $data['total'],
+            $data['per_page'],
+            $data['current_page'],
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        // возвращаем объект!
+        return $result;
+    }
+
+    public function getMaxProductPrice(): int
+    {
+        return (int) Cache::remember('max_product_price', 3600, function () {
+            return (int) Product::max('price') ?? 0;
+        });
     }
 
 }

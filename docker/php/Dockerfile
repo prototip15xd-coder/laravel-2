@@ -26,8 +26,7 @@ RUN apt-get update && apt-get install -y \
         sockets  \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Xdebug
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install redis && docker-php-ext-enable redis
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -40,6 +39,6 @@ WORKDIR /var/www/html
 
 COPY --chown=www-data:www-data . .
 
-USER www-data
-
 RUN if ! pecl list | grep xdebug; then pecl install xdebug; fi && docker-php-ext-enable xdebug
+
+USER www-data
