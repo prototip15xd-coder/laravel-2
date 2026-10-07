@@ -80,6 +80,26 @@ services:
       depends_on:
           - php-fpm
 
+  elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
+      container_name: laravel-elasticsearch
+      environment:
+          - discovery.type=single-node # Режим одного узла для локальной разработки (для себя а не продакшен)
+          - xpack.security.enabled=false
+          - ES_JAVA_OPTS=-Xms512m -Xmx512m      # Ограничиваем память, чтобы не съел всю
+      volumes:
+          - es_data:/usr/share/elasticsearch/data # Сохраняем данные на случай перезапуска
+      ports:
+          - "9200:9200" # Пробрасываем порт, чтобы Laravel мог подключаться
+      networks:
+          - app-network
+      healthcheck:
+          test: [ "CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s || exit 1" ]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+          start_period: 20s
+
   rabbitmq:
       image: rabbitmq:4-management
       container_name: rabbitmq
@@ -94,4 +114,8 @@ services:
 networks:
     app-network:
         driver: bridge
+
+volumes:
+    es_data:
+        driver: local
 

@@ -46,15 +46,18 @@ class ProductService
          * чтобы они не ломали остальные фильтры.
          */
         if ($dto->q) {
-            $q = $dto->q;
-
-            $query->where(function ($subQuery) use ($q) {
-                $subQuery
-                    ->where('name', 'like', '%' . $q . '%')
-                    ->orWhere('sku', 'like', '%' . $q . '%');
-            });
+            //            $q = $dto->q;
+            //            $query->where(function ($subQuery) use ($q) {
+            //                $subQuery
+            //                    ->where('name', 'like', '%' . $q . '%')
+            //                    ->orWhere('sku', 'like', '%' . $q . '%');
+            //            });
+            return Product::search($dto->q)
+                ->paginate($dto->per_page)
+                ->withQueryString();
         }
 
+        $query = Product::query();
         /**
          * 2) Фильтр по цене
          */
